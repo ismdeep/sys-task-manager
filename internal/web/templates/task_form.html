@@ -1,0 +1,464 @@
+{{define "task_form.html"}}
+<!DOCTYPE html>
+<html lang="{{htmlLang .Locale}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{if eq .Mode "edit"}}{{t .Locale "task_form.page_title_edit"}}{{else}}{{t .Locale "task_form.page_title_create"}}{{end}}</title>
+  <style>
+    {{template "admin-shared-css" .}}
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #047857;
+      background: var(--accent-soft);
+      white-space: nowrap;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .panel h3 {
+      margin: 0 0 16px;
+      font-size: 16px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px 18px;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .field-hint {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      background: var(--panel-strong);
+      border-radius: 16px;
+      padding: 12px 14px;
+      outline: none;
+      color: var(--text);
+    }
+
+    input[readonly] {
+      background: rgba(15, 23, 42, 0.05);
+      color: var(--muted);
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .checkbox-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .checkbox-row input {
+      width: auto;
+      margin: 0;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .danger-zone {
+      border-color: rgba(220, 38, 38, 0.22);
+      background: linear-gradient(180deg, rgba(220, 38, 38, 0.07), rgba(255, 255, 255, 0.84));
+    }
+
+    .danger-copy {
+      margin: 0 0 16px;
+      color: #991b1b;
+      line-height: 1.7;
+      font-size: 13px;
+    }
+
+    .section-copy {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 0 0 16px;
+    }
+
+    @media (max-width: 1100px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-main">
+        <div>
+          <h1>{{t .Locale "common.app_name"}}</h1>
+          <div class="sidebar-copy">{{t .Locale "task_form.sidebar_intro"}}</div>
+        </div>
+        <a class="nav-card" href="/tasks">
+          <strong>{{t .Locale "task_form.back_to_tasks"}}</strong>
+          <span>{{t .Locale "task_form.back_to_tasks_body"}}</span>
+        </a>
+        <div class="nav-card">
+          <strong>{{if eq .Mode "edit"}}{{t .Locale "task_form.edit_flow"}}{{else}}{{t .Locale "task_form.create_flow"}}{{end}}</strong>
+          <span>{{if eq .Mode "edit"}}{{t .Locale "task_form.editing_existing"}}{{else}}{{t .Locale "task_form.creating_new"}}{{end}}</span>
+        </div>
+      </div>
+      <div class="sidebar-footer">
+        <div class="account-card">
+          <details class="account-menu">
+            <summary class="account-trigger">
+              <div class="account-summary">
+                <span class="avatar">{{initial .Username}}</span>
+                <div class="account-text">
+                  <div class="account-line">
+                    <span class="account-name">{{.Username}}</span>
+                    <span class="account-meta">{{t .Locale "common.admin"}}</span>
+                  </div>
+                </div>
+              </div>
+            </summary>
+            <div class="account-dropdown">
+              <div class="menu-header">
+                <span class="avatar">{{initial .Username}}</span>
+                <div class="account-text">
+                  <div class="account-line">
+                    <span class="account-name">{{.Username}}</span>
+                    <span class="account-meta">{{t .Locale "common.admin"}}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="menu-divider"></div>
+              <div class="menu-group">
+                <button type="button" class="menu-item">
+                  <span class="menu-icon">✦</span>
+                  <span class="menu-label">{{t .Locale "task_form.upgrade_plan"}}</span>
+                </button>
+                <button type="button" class="menu-item">
+                  <span class="menu-icon">◔</span>
+                  <span class="menu-label">{{t .Locale "task_form.personalization"}}</span>
+                </button>
+                <button type="button" class="menu-item">
+                  <span class="menu-icon">●</span>
+                  <span class="menu-label">{{t .Locale "task_form.profile"}}</span>
+                </button>
+                <button type="button" class="menu-item">
+                  <span class="menu-icon">⚙</span>
+                  <span class="menu-label">{{t .Locale "common.setting"}}</span>
+                </button>
+                {{template "admin-settings-locale-switcher" .}}
+              </div>
+              <div class="menu-divider"></div>
+              <div class="menu-group">
+                <button type="button" class="menu-item">
+                  <span class="menu-icon">◌</span>
+                  <span class="menu-label">{{t .Locale "task_form.help"}}</span>
+                  <span class="menu-arrow">›</span>
+                </button>
+                <form method="post" action="/logout" class="menu-form">
+                  <button type="submit" class="menu-item">
+                    <span class="menu-icon">↳</span>
+                    <span class="menu-label">{{t .Locale "common.logout"}}</span>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      {{if .Message}}<div class="message">{{.Message}}</div>{{end}}
+      {{if .Error}}<div class="error">{{.Error}}</div>{{end}}
+
+      <section class="hero">
+        <div>
+          <h2>{{if eq .Mode "edit"}}{{t .Locale "task_form.hero_edit_title"}}{{else}}{{t .Locale "task_form.hero_create_title"}}{{end}}</h2>
+          <p>{{if eq .Mode "edit"}}{{t .Locale "task_form.hero_edit_body"}}{{else}}{{t .Locale "task_form.hero_create_body"}}{{end}}</p>
+        </div>
+        <div class="hero-meta">
+          <span class="pill">{{if eq .Mode "edit"}}{{t .Locale "task_form.editing"}}{{else}}{{t .Locale "task_form.new_task"}}{{end}}</span>
+          <span class="pill">{{if .Task.Type}}{{.Task.Type}}{{else}}manual{{end}}</span>
+        </div>
+      </section>
+
+      <form method="post" action="{{if eq .Mode "edit"}}/tasks/{{.Task.Name}}/edit{{else}}/tasks{{end}}">
+        <section class="panel">
+          <h3>{{t .Locale "task_form.basic_info"}}</h3>
+          <p class="section-copy">{{t .Locale "task_form.basic_info_body"}}</p>
+          <div class="grid">
+            <label>{{t .Locale "task_form.name"}}
+              <input name="name" value="{{.Task.Name}}" {{if eq .Mode "edit"}}readonly{{else}}required{{end}}>
+              <span class="field-hint">{{if eq .Mode "edit"}}{{t .Locale "task_form.name_edit_hint"}}{{else}}{{t .Locale "task_form.name_create_hint"}}{{end}}</span>
+            </label>
+            <label>{{t .Locale "tasks.type"}}
+              <select name="type">
+                <option value="manual" {{if eq .Task.Type "manual"}}selected{{end}}>manual</option>
+                <option value="cron" {{if eq .Task.Type "cron"}}selected{{end}}>cron</option>
+                <option value="daemon" {{if eq .Task.Type "daemon"}}selected{{end}}>daemon</option>
+              </select>
+              <span class="field-hint">{{t .Locale "task_form.type_hint"}}</span>
+            </label>
+            <label>{{t .Locale "runs.run_as"}}
+              <input name="run_as_user" value="{{.Task.RunAsUser}}">
+              <span class="field-hint">{{t .Locale "task_form.run_as_hint"}}</span>
+            </label>
+            <label>{{t .Locale "tasks.cron_expr"}}
+              <input name="cron_expr" value="{{.Task.CronExpr}}" placeholder="*/15 * * * * *">
+              <span class="field-hint">{{t .Locale "task_form.cron_hint"}}</span>
+            </label>
+            <label>{{t .Locale "task_form.timeout_seconds"}}
+              <input name="timeout_seconds" value="{{printf "%.0f" .Task.Timeout.Seconds}}">
+              <span class="field-hint">{{t .Locale "task_form.timeout_hint"}}</span>
+            </label>
+            <label>{{t .Locale "tasks.retry"}}
+              <input name="retry" value="{{.Task.Retry}}">
+              <span class="field-hint">{{t .Locale "task_form.retry_hint"}}</span>
+            </label>
+          </div>
+          <div class="stack" style="margin-top:16px;">
+            <label>{{t .Locale "tasks.description"}}
+              <textarea name="description" style="min-height:120px;font-family:inherit;font-size:14px;">{{.Task.Description}}</textarea>
+              <span class="field-hint">{{t .Locale "task_form.description_hint"}}</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>{{t .Locale "task_form.command_section"}}</h3>
+          <p class="section-copy">{{t .Locale "task_form.command_section_body"}}</p>
+          <div class="grid">
+            <label>{{t .Locale "tasks.command"}}
+              <input name="command" value="{{.Task.Command.Command}}" required>
+              <span class="field-hint">{{t .Locale "task_form.command_hint"}}</span>
+            </label>
+            <label>{{t .Locale "tasks.work_dir"}}
+              <input name="work_dir" value="{{.Task.Command.WorkDir}}">
+              <span class="field-hint">{{t .Locale "task_form.work_dir_hint"}}</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel stack">
+          <div>
+            <h3>{{t .Locale "tasks.args"}}</h3>
+            <p class="section-copy">{{t .Locale "task_form.args_body"}}</p>
+            <textarea name="args">{{.ArgsText}}</textarea>
+          </div>
+          <div>
+            <h3>{{t .Locale "tasks.env"}}</h3>
+            <p class="section-copy">{{t .Locale "task_form.env_body"}}</p>
+            <textarea name="env">{{.EnvText}}</textarea>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>{{t .Locale "task_form.submit_section"}}</h3>
+          <p class="section-copy">{{if eq .Mode "edit"}}{{t .Locale "task_form.submit_edit_body"}}{{else}}{{t .Locale "task_form.submit_create_body"}}{{end}}</p>
+          <div class="actions">
+            <button type="submit">{{if eq .Mode "edit"}}{{t .Locale "task_form.save_changes"}}{{else}}{{t .Locale "tasks.create_task"}}{{end}}</button>
+            <a class="button button-secondary" href="/tasks">{{t .Locale "common.cancel"}}</a>
+          </div>
+        </section>
+      </form>
+
+      {{if eq .Mode "edit"}}
+      <section class="panel danger-zone">
+        <h3>{{t .Locale "task_form.delete_section"}}</h3>
+        <p class="danger-copy">{{t .Locale "task_form.delete_body"}}</p>
+        <form method="post" action="/tasks/{{.Task.Name}}/delete" data-confirm-delete="{{tf .Locale "tasks.delete_confirm" .Task.Name}}">
+          <input type="hidden" name="redirect_to" value="/tasks/{{.Task.Name}}/edit">
+          <div class="actions">
+            <button type="submit" class="button-danger">{{t .Locale "tasks.delete_task"}}</button>
+          </div>
+        </form>
+      </section>
+      {{end}}
+    </main>
+  </div>
+  {{template "admin-settings-dialog" .}}
+  {{template "admin-confirm-dialog" .}}
+  <script>
+    (() => {
+      const settingsDialog = document.getElementById("settings-dialog");
+      const settingsDialogClose = document.getElementById("settings-dialog-close");
+      const settingsLanguageSelect = document.getElementById("settings-language-select");
+      const settingsTabButtons = document.querySelectorAll("[data-settings-tab-button]");
+      const settingsTabPanels = document.querySelectorAll("[data-settings-tab-panel]");
+      const passwordToggle = document.querySelector("[data-password-toggle]");
+      const passwordForm = document.querySelector("[data-password-form]");
+      const confirmDialog = document.getElementById("confirm-dialog");
+      const confirmDialogMessage = document.getElementById("confirm-dialog-message");
+      const confirmDialogCancel = document.getElementById("confirm-dialog-cancel");
+      const confirmDialogConfirm = document.getElementById("confirm-dialog-confirm");
+      const defaultConfirmMessage = {{printf "%q" (t .Locale "confirm.continue")}};
+      let pendingDeleteForm = null;
+
+      function setSettingsTab(tabName) {
+        settingsTabButtons.forEach((button) => {
+          const isActive = button.dataset.settingsTabButton === tabName;
+          button.classList.toggle("active", isActive);
+          button.setAttribute("aria-selected", isActive ? "true" : "false");
+        });
+
+        settingsTabPanels.forEach((panel) => {
+          panel.hidden = panel.dataset.settingsTabPanel !== tabName;
+        });
+      }
+
+      function showPasswordForm() {
+        if (!passwordForm) return;
+        passwordForm.hidden = false;
+        passwordToggle?.setAttribute("hidden", "");
+      }
+
+      function resetSettingsDialog() {
+        setSettingsTab("general");
+        if (passwordForm) passwordForm.hidden = true;
+        passwordToggle?.removeAttribute("hidden");
+      }
+
+      function openSettingsDialog(trigger) {
+        resetSettingsDialog();
+        const accountMenu = trigger?.closest("details.account-menu");
+        if (accountMenu?.open) {
+          accountMenu.open = false;
+          requestAnimationFrame(() => settingsDialog.showModal());
+          return;
+        }
+        settingsDialog.showModal();
+      }
+
+      if (settingsDialog) {
+        document.querySelectorAll("[data-open-settings-dialog]").forEach((button) => {
+          button.addEventListener("click", () => {
+            openSettingsDialog(button);
+          });
+        });
+
+        settingsTabButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            setSettingsTab(button.dataset.settingsTabButton || "general");
+          });
+        });
+
+        settingsDialogClose?.addEventListener("click", () => {
+          resetSettingsDialog();
+          settingsDialog.close();
+        });
+
+        settingsDialog.addEventListener("cancel", () => {
+          resetSettingsDialog();
+          settingsDialog.close();
+        });
+
+        settingsLanguageSelect?.addEventListener("change", () => {
+          const nextURL = settingsLanguageSelect.value;
+          if (!nextURL) return;
+          window.location.href = nextURL;
+        });
+
+        passwordToggle?.addEventListener("click", () => {
+          setSettingsTab("security");
+          showPasswordForm();
+        });
+
+        const searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.get("settings") === "password") {
+          setSettingsTab("security");
+          showPasswordForm();
+          settingsDialog.showModal();
+        }
+      }
+
+      if (!confirmDialog || !confirmDialogMessage || !confirmDialogCancel || !confirmDialogConfirm) {
+        return;
+      }
+
+      document.querySelectorAll("form[data-confirm-delete]").forEach((form) => {
+        form.addEventListener("submit", (event) => {
+          event.preventDefault();
+          pendingDeleteForm = form;
+          confirmDialogMessage.textContent = form.dataset.confirmDelete || defaultConfirmMessage;
+          confirmDialog.showModal();
+        });
+      });
+
+      confirmDialogCancel.addEventListener("click", () => {
+        pendingDeleteForm = null;
+        confirmDialog.close();
+      });
+
+      confirmDialog.addEventListener("cancel", (event) => {
+        event.preventDefault();
+        pendingDeleteForm = null;
+        confirmDialog.close();
+      });
+
+      confirmDialogConfirm.addEventListener("click", () => {
+        if (!pendingDeleteForm) {
+          confirmDialog.close();
+          return;
+        }
+        const form = pendingDeleteForm;
+        pendingDeleteForm = null;
+        confirmDialog.close();
+        form.submit();
+      });
+    })();
+  </script>
+</body>
+</html>
+{{end}}

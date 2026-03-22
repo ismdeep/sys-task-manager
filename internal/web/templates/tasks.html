@@ -1,0 +1,813 @@
+{{define "tasks.html"}}
+<!DOCTYPE html>
+<html lang="{{htmlLang .Locale}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{t .Locale "tasks.page_title"}}</title>
+  <style>
+    {{template "admin-shared-css" .}}
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .task-link {
+      display: block;
+      padding: 14px;
+      border-radius: 18px;
+      color: #e5e7eb;
+      text-decoration: none;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid transparent;
+      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    }
+
+    .task-link:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    .task-link.active {
+      background: linear-gradient(180deg, rgba(16, 163, 127, 0.28), rgba(16, 163, 127, 0.14));
+      border-color: rgba(16, 163, 127, 0.34);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .task-name-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .task-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      word-break: break-word;
+    }
+
+    .task-type {
+      font-size: 12px;
+      color: var(--sidebar-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .task-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      font-size: 12px;
+      color: var(--sidebar-muted);
+    }
+
+    .hero,
+    .detail-card,
+    .record-card,
+    .empty-state {
+      border-radius: 24px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .inline-form {
+      margin: 0;
+    }
+
+    .hero-actions .button-secondary {
+      background: rgba(15, 23, 42, 0.06);
+      color: var(--text);
+    }
+
+    .toggle-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(255,255,255,0.76);
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .toggle-switch:hover {
+      border-color: rgba(16, 163, 127, 0.28);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .switch-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .switch-track {
+      position: relative;
+      width: 52px;
+      height: 30px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.42);
+      transition: background 0.18s ease;
+      flex-shrink: 0;
+    }
+
+    .switch-track::after {
+      content: "";
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.22);
+      transition: transform 0.18s ease;
+    }
+
+    .switch-input:checked + .switch-track {
+      background: linear-gradient(135deg, #10a37f, #0f766e);
+    }
+
+    .switch-input:checked + .switch-track::after {
+      transform: translateX(22px);
+    }
+
+    .switch-input:focus-visible + .switch-track {
+      outline: 2px solid rgba(16, 163, 127, 0.35);
+      outline-offset: 3px;
+    }
+
+    .toggle-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.2;
+    }
+
+    .toggle-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .toggle-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .summary-grid,
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .detail-card {
+      padding: 22px;
+    }
+
+    .detail-card h3 {
+      margin: 0 0 16px;
+      font-size: 16px;
+    }
+
+    .kv-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 18px;
+    }
+
+    .kv-item span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .kv-item strong,
+    .mono-block {
+      word-break: break-word;
+    }
+
+    .mono-block,
+    pre {
+      margin: 0;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      color: #0f172a;
+      font-family: "SFMono-Regular", "SFMono-Regular", Consolas, monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .run-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .run-form button:disabled {
+      cursor: not-allowed;
+      transform: none;
+      opacity: 0.7;
+      box-shadow: none;
+    }
+
+    .records {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .record-card {
+      padding: 20px;
+    }
+
+    .record-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .record-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .record-card a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .empty-state {
+      padding: 48px 32px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions {
+        justify-content: flex-start;
+      }
+
+      .summary-grid,
+      .detail-grid,
+      .kv-grid,
+      .run-form {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-main">
+        <div class="sidebar-header">
+          <div>
+            <h1>{{t .Locale "common.app_name"}}</h1>
+            <div class="sidebar-meta">{{t .Locale "tasks.sidebar_intro"}}</div>
+          </div>
+          <div class="sidebar-actions">
+            <a class="button button-primary" href="/tasks/new" target="_blank" rel="noopener">{{t .Locale "tasks.create_task"}}</a>
+          </div>
+        </div>
+
+        <div class="task-list">
+          {{range .Tasks}}
+          <a class="task-link{{if .IsSelected}} active{{end}}" href="/tasks?task={{.Task.Name}}">
+            <div class="task-name-row">
+              <div class="task-name">{{.Task.Name}}</div>
+              {{if .Task.Enabled}}
+                {{if .Status.Status}}
+                <span class="status-pill {{statusClass (printf "%s" .Status.Status)}}">{{statusLabel $.Locale (printf "%s" .Status.Status)}}</span>
+                {{else}}
+                <span class="status-pill {{statusClass "pending"}}">{{t $.Locale "status.pending"}}</span>
+                {{end}}
+              {{else}}
+              <span class="status-pill {{statusClass "disabled"}}">{{t $.Locale "status.disabled"}}</span>
+              {{end}}
+            </div>
+            <div class="task-type">{{.Task.Type}}</div>
+            <div class="task-stats">
+              <div>{{tf $.Locale "tasks.run_count" .RunCount}}</div>
+              <div>{{if .LastRun}}{{tf $.Locale "tasks.last_status" (statusLabel $.Locale (printf "%s" .LastRun.Status))}}{{else}}{{tf $.Locale "tasks.last_status" (t $.Locale "status.never")}}{{end}}</div>
+              <div>{{tf $.Locale "tasks.run_as" .Task.RunAsUser}}</div>
+              <div>{{tf $.Locale "tasks.created_at" (formatTime .Task.CreatedAt)}}</div>
+            </div>
+          </a>
+          {{end}}
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="account-card">
+          <details class="account-menu">
+            <summary class="account-trigger">
+              <div class="account-summary">
+                <span class="avatar">{{initial .Username}}</span>
+                <div class="account-text">
+                  <div class="account-line">
+                    <span class="account-name">{{.Username}}</span>
+                    <span class="account-meta">{{t .Locale "common.admin"}}</span>
+                  </div>
+                </div>
+              </div>
+            </summary>
+            <div class="account-dropdown">
+              <div class="menu-header">
+                <span class="avatar">{{initial .Username}}</span>
+                <div class="account-text">
+                  <div class="account-line">
+                    <span class="account-name">{{.Username}}</span>
+                    <span class="account-meta">{{t .Locale "common.admin"}}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="menu-divider"></div>
+              <div class="menu-group">
+                {{template "admin-settings-locale-switcher" .}}
+              </div>
+              <div class="menu-divider"></div>
+              <div class="menu-group">
+                <form method="post" action="/logout" class="menu-form">
+                  <button type="submit" class="menu-item">
+                    <span class="menu-icon">↳</span>
+                    <span class="menu-label">{{t .Locale "common.logout"}}</span>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      {{if .SelectedTask}}
+      <section class="hero">
+        <div>
+          <h2>{{.SelectedTask.Task.Name}}</h2>
+          <p class="hero-subtitle">{{if .SelectedTask.DescriptionText}}{{.SelectedTask.DescriptionText}}{{else}}{{t .Locale "tasks.hero_intro"}}{{end}}</p>
+        </div>
+        <div class="hero-actions">
+          <label class="toggle-switch">
+            <input
+              class="switch-input"
+              type="checkbox"
+              value="1"
+              data-toggle-api="/api/tasks/{{.SelectedTask.Task.Name}}/enabled"
+              data-toggle-error="{{t .Locale "tasks.toggle_failed"}}"
+              data-enabled-label="{{t .Locale "tasks.enabled"}}"
+              data-disabled-label="{{t .Locale "status.disabled"}}"
+              data-status-enabled="{{.SelectedTask.CurrentStatus}}"
+              data-status-disabled="disabled"
+              {{if .SelectedTask.Task.Enabled}}checked{{end}}
+            >
+            <span class="switch-track" aria-hidden="true"></span>
+            <span class="toggle-copy">
+              <span class="toggle-label">{{t .Locale "tasks.enabled_state"}}</span>
+              <span class="toggle-value" id="task-enabled-value">{{if .SelectedTask.Task.Enabled}}{{t .Locale "tasks.enabled"}}{{else}}{{t .Locale "status.disabled"}}{{end}}</span>
+            </span>
+          </label>
+          <a class="button button-secondary" href="/tasks/{{.SelectedTask.Task.Name}}/edit" target="_blank" rel="noopener">{{t .Locale "tasks.edit_task"}}</a>
+          <a class="button button-secondary" href="/tasks/{{.SelectedTask.Task.Name}}/runs">{{t .Locale "tasks.open_all_runs"}}</a>
+          <form method="post" action="/tasks/{{.SelectedTask.Task.Name}}/delete" class="inline-form" data-confirm-delete="{{tf .Locale "tasks.delete_confirm" .SelectedTask.Task.Name}}">
+            <input type="hidden" name="redirect_to" value="/tasks?task={{.SelectedTask.Task.Name}}">
+            <button type="submit" class="button-danger">{{t .Locale "tasks.delete_task"}}</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="summary-grid">
+        <article class="detail-card">
+          <h3>{{t .Locale "tasks.overview"}}</h3>
+          <div class="kv-grid">
+            <div class="kv-item">
+              <span>{{t .Locale "tasks.type"}}</span>
+              <strong>{{.SelectedTask.Task.Type}}</strong>
+            </div>
+            <div class="kv-item">
+              <span>{{t .Locale "tasks.current_status"}}</span>
+              <strong><span id="task-current-status" class="status-pill {{statusClass .SelectedTask.CurrentStatus}}">{{statusLabel .Locale .SelectedTask.CurrentStatus}}</span></strong>
+            </div>
+            <div class="kv-item">
+              <span>{{t .Locale "tasks.created_time"}}</span>
+              <strong>{{formatTime .SelectedTask.Task.CreatedAt}}</strong>
+            </div>
+            <div class="kv-item">
+              <span>{{t .Locale "tasks.execution_count"}}</span>
+              <strong>{{.SelectedTask.RunCount}}</strong>
+            </div>
+            <div class="kv-item">
+              <span>{{t .Locale "tasks.last_run_status"}}</span>
+              <strong><span class="status-pill {{statusClass .SelectedTask.LastStatus}}">{{statusLabel .Locale .SelectedTask.LastStatus}}</span></strong>
+            </div>
+            <div class="kv-item">
+              <span>{{t .Locale "tasks.timeout"}}</span>
+              <strong>{{.SelectedTask.TimeoutText}}</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="detail-card">
+          <h3>{{t .Locale "tasks.run_now"}}</h3>
+          {{if eq .SelectedTask.Task.Type "daemon"}}
+          <p class="hero-subtitle" style="margin:0;">{{t .Locale "tasks.daemon_hint"}}</p>
+          {{else}}
+          <form method="post" action="/tasks/{{.SelectedTask.Task.Name}}/run" class="run-form" data-run-api="/api/tasks/{{.SelectedTask.Task.Name}}/run" data-run-error="{{t .Locale "tasks.run_failed"}}">
+            <button type="submit" data-default-label="{{t .Locale "tasks.run_button"}}">{{t .Locale "tasks.run_button"}}</button>
+          </form>
+          {{end}}
+          <div class="kv-grid" style="margin-top:16px;">
+            <div class="kv-item">
+              <span>{{t .Locale "runs.run_as"}}</span>
+              <strong>{{.SelectedTask.Task.RunAsUser}}</strong>
+            </div>
+            <div class="kv-item">
+              <span>{{t .Locale "tasks.retry"}}</span>
+              <strong>{{.SelectedTask.Task.Retry}}</strong>
+            </div>
+            <div class="kv-item">
+              <span>{{t .Locale "tasks.cron_expr"}}</span>
+              <strong>{{if .SelectedTask.Task.CronExpr}}{{.SelectedTask.Task.CronExpr}}{{else}}{{t .Locale "common.not_available"}}{{end}}</strong>
+            </div>
+            <div class="kv-item">
+              <span>{{t .Locale "tasks.last_error"}}</span>
+              <strong>{{.SelectedTask.LastErrorMessage}}</strong>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="detail-grid">
+        <article class="detail-card">
+          <h3>{{t .Locale "tasks.description"}}</h3>
+          <pre>{{if .SelectedTask.DescriptionText}}{{.SelectedTask.DescriptionText}}{{else}}{{t .Locale "common.not_available"}}{{end}}</pre>
+        </article>
+
+        <article class="detail-card">
+          <h3>{{t .Locale "tasks.command"}}</h3>
+          <pre>{{.SelectedTask.CommandLine}}</pre>
+          <div class="kv-grid" style="margin-top:16px;">
+            <div class="kv-item">
+              <span>{{t .Locale "tasks.work_dir"}}</span>
+              <strong>{{if .SelectedTask.Task.Command.WorkDir}}{{.SelectedTask.Task.Command.WorkDir}}{{else}}{{t .Locale "common.not_available"}}{{end}}</strong>
+            </div>
+            <div class="kv-item">
+              <span>{{t .Locale "tasks.enabled_state"}}</span>
+              <strong id="task-enabled-state">{{if .SelectedTask.Task.Enabled}}{{t .Locale "tasks.enabled"}}{{else}}{{t .Locale "status.disabled"}}{{end}}</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="detail-card">
+          <h3>{{t .Locale "tasks.arguments_env"}}</h3>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">{{t .Locale "tasks.args"}}</div>
+              <pre>{{if .SelectedTask.ArgumentsText}}{{.SelectedTask.ArgumentsText}}{{else}}{{t .Locale "common.not_available"}}{{end}}</pre>
+            </div>
+            <div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">{{t .Locale "tasks.env"}}</div>
+              <pre>{{if .SelectedTask.EnvironmentText}}{{.SelectedTask.EnvironmentText}}{{else}}{{t .Locale "common.not_available"}}{{end}}</pre>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="detail-card">
+        <h3>{{t .Locale "tasks.run_history"}}</h3>
+        {{if .SelectedTask.Runs}}
+        <div class="records">
+          {{range .SelectedTask.Runs}}
+          <article class="record-card">
+            <div class="record-header">
+              <div>
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                  <span class="status-pill {{statusClass (printf "%s" .Status)}}">{{statusLabel $.Locale (printf "%s" .Status)}}</span>
+                  <strong>{{tf $.Locale "tasks.run_id" .ID}}</strong>
+                </div>
+                <div class="record-meta" style="margin-top:10px;">
+                  <span>{{tf $.Locale "tasks.started_at" (formatTime .StartedAt)}}</span>
+                  <span>{{tf $.Locale "tasks.duration" (formatDurationMS .DurationMS)}}</span>
+                  <span>{{tf $.Locale "tasks.trigger" .Trigger}}</span>
+                  <span>{{tf $.Locale "tasks.run_as" .RunAsUser}}</span>
+                  <span>{{tf $.Locale "tasks.attempt" .Attempt}}</span>
+                </div>
+              </div>
+              {{if or .LogContent .LogPath}}<a href="/runs/{{.ID}}/log" target="_blank" rel="noopener">{{t $.Locale "tasks.open_log"}}</a>{{end}}
+            </div>
+            {{if .ErrorMsg}}<pre>{{.ErrorMsg}}</pre>{{end}}
+            {{if .LogContent}}<pre style="margin-top:12px;">{{.LogContent}}</pre>{{end}}
+          </article>
+          {{end}}
+        </div>
+        {{else}}
+        <div class="empty-state">{{t .Locale "tasks.no_runs"}}</div>
+        {{end}}
+      </section>
+      {{else}}
+      <div class="empty-state">
+        <h2 style="margin-top:0;color:var(--text);">{{t .Locale "tasks.no_tasks_title"}}</h2>
+        <p>{{t .Locale "tasks.no_tasks_body"}}</p>
+      </div>
+      {{end}}
+    </main>
+  </div>
+  {{template "admin-settings-dialog" .}}
+  {{template "admin-confirm-dialog" .}}
+  <script>
+    (() => {
+      const messageBanner = document.getElementById("page-message");
+      const errorBanner = document.getElementById("page-error");
+      const settingsDialog = document.getElementById("settings-dialog");
+      const settingsDialogClose = document.getElementById("settings-dialog-close");
+      const settingsLanguageSelect = document.getElementById("settings-language-select");
+      const settingsTabButtons = document.querySelectorAll("[data-settings-tab-button]");
+      const settingsTabPanels = document.querySelectorAll("[data-settings-tab-panel]");
+      const passwordToggle = document.querySelector("[data-password-toggle]");
+      const passwordForm = document.querySelector("[data-password-form]");
+      const confirmDialog = document.getElementById("confirm-dialog");
+      const confirmDialogMessage = document.getElementById("confirm-dialog-message");
+      const confirmDialogCancel = document.getElementById("confirm-dialog-cancel");
+      const confirmDialogConfirm = document.getElementById("confirm-dialog-confirm");
+      const defaultConfirmMessage = {{printf "%q" (t .Locale "confirm.continue")}};
+      let pendingDeleteForm = null;
+
+      function showBanner(element, text) {
+        if (!element) return;
+        element.textContent = text || "";
+        element.classList.toggle("flash-hidden", !text);
+      }
+
+      function setSettingsTab(tabName) {
+        settingsTabButtons.forEach((button) => {
+          const isActive = button.dataset.settingsTabButton === tabName;
+          button.classList.toggle("active", isActive);
+          button.setAttribute("aria-selected", isActive ? "true" : "false");
+        });
+
+        settingsTabPanels.forEach((panel) => {
+          panel.hidden = panel.dataset.settingsTabPanel !== tabName;
+        });
+      }
+
+      function showPasswordForm() {
+        if (!passwordForm) return;
+        passwordForm.hidden = false;
+        passwordToggle?.setAttribute("hidden", "");
+      }
+
+      function resetSettingsDialog() {
+        setSettingsTab("general");
+        if (passwordForm) passwordForm.hidden = true;
+        passwordToggle?.removeAttribute("hidden");
+      }
+
+      function openSettingsDialog(trigger) {
+        resetSettingsDialog();
+        const accountMenu = trigger?.closest("details.account-menu");
+        if (accountMenu?.open) {
+          accountMenu.open = false;
+          requestAnimationFrame(() => settingsDialog.showModal());
+          return;
+        }
+        settingsDialog.showModal();
+      }
+
+      if (settingsDialog) {
+        document.querySelectorAll("[data-open-settings-dialog]").forEach((button) => {
+          button.addEventListener("click", () => {
+            openSettingsDialog(button);
+          });
+        });
+
+        settingsTabButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            setSettingsTab(button.dataset.settingsTabButton || "general");
+          });
+        });
+
+        settingsDialogClose?.addEventListener("click", () => {
+          resetSettingsDialog();
+          settingsDialog.close();
+        });
+
+        settingsDialog.addEventListener("cancel", () => {
+          resetSettingsDialog();
+          settingsDialog.close();
+        });
+
+        settingsLanguageSelect?.addEventListener("change", () => {
+          const nextURL = settingsLanguageSelect.value;
+          if (!nextURL) return;
+          window.location.href = nextURL;
+        });
+
+        passwordToggle?.addEventListener("click", () => {
+          setSettingsTab("security");
+          showPasswordForm();
+        });
+
+        const searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.get("settings") === "password") {
+          setSettingsTab("security");
+          showPasswordForm();
+          settingsDialog.showModal();
+        }
+      }
+
+      if (confirmDialog && confirmDialogMessage && confirmDialogCancel && confirmDialogConfirm) {
+        document.querySelectorAll("form[data-confirm-delete]").forEach((form) => {
+          form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            pendingDeleteForm = form;
+            confirmDialogMessage.textContent = form.dataset.confirmDelete || defaultConfirmMessage;
+            confirmDialog.showModal();
+          });
+        });
+
+        confirmDialogCancel.addEventListener("click", () => {
+          pendingDeleteForm = null;
+          confirmDialog.close();
+        });
+
+        confirmDialog.addEventListener("cancel", (event) => {
+          event.preventDefault();
+          pendingDeleteForm = null;
+          confirmDialog.close();
+        });
+
+        confirmDialogConfirm.addEventListener("click", () => {
+          if (!pendingDeleteForm) {
+            confirmDialog.close();
+            return;
+          }
+          const form = pendingDeleteForm;
+          pendingDeleteForm = null;
+          confirmDialog.close();
+          form.submit();
+        });
+      }
+
+      document.querySelectorAll(".run-form[data-run-api]").forEach((form) => {
+        const button = form.querySelector('button[type="submit"]');
+        if (!button) return;
+
+        const defaultLabel = button.dataset.defaultLabel || button.textContent;
+        const defaultError = form.dataset.runError || {{printf "%q" (t .Locale "tasks.run_failed")}};
+
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (button.disabled) return;
+
+          showBanner(errorBanner, "");
+          showBanner(messageBanner, "");
+
+          const payload = {
+            override_as: (form.querySelector('input[name="override_as"]')?.value || "").trim(),
+          };
+
+          button.disabled = true;
+
+          try {
+            const response = await fetch(form.dataset.runApi, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+              },
+              body: JSON.stringify(payload),
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+              throw new Error(data.error || defaultError);
+            }
+
+            button.textContent = data.message || defaultLabel;
+            setTimeout(() => {
+              button.textContent = defaultLabel;
+              button.disabled = false;
+            }, 3000);
+          } catch (error) {
+            button.textContent = defaultLabel;
+            button.disabled = false;
+            showBanner(errorBanner, error instanceof Error ? error.message : defaultError);
+          }
+        });
+      });
+
+      document.querySelectorAll(".switch-input[data-toggle-api]").forEach((input) => {
+        const enabledValue = document.getElementById("task-enabled-value");
+        const enabledState = document.getElementById("task-enabled-state");
+        const currentStatus = document.getElementById("task-current-status");
+        const defaultError = input.dataset.toggleError || "Update task state failed";
+
+        function statusClassFor(status) {
+          switch ((status || "").toLowerCase()) {
+            case "success":
+              return "status-pill success";
+            case "failed":
+              return "status-pill failed";
+            case "running":
+              return "status-pill running";
+            case "disabled":
+              return "status-pill disabled";
+            default:
+              return "status-pill pending";
+          }
+        }
+
+        input.addEventListener("change", async () => {
+          const nextEnabled = input.checked;
+          input.disabled = true;
+
+          showBanner(errorBanner, "");
+          showBanner(messageBanner, "");
+
+          try {
+            const response = await fetch(input.dataset.toggleApi, {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+              },
+              body: JSON.stringify({ enabled: nextEnabled }),
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+              throw new Error(data.error || defaultError);
+            }
+
+            const enabled = !!data.enabled;
+            const labels = {
+              pending: {{t .Locale "status.pending"}},
+              running: {{t .Locale "status.running"}},
+              success: {{t .Locale "status.success"}},
+              failed: {{t .Locale "status.failed"}},
+              disabled: {{t .Locale "status.disabled"}},
+            };
+
+            input.checked = enabled;
+            if (enabledValue) {
+              enabledValue.textContent = enabled ? (input.dataset.enabledLabel || "") : (input.dataset.disabledLabel || "");
+            }
+            if (enabledState) {
+              enabledState.textContent = enabled ? (input.dataset.enabledLabel || "") : (input.dataset.disabledLabel || "");
+            }
+            if (currentStatus) {
+              const nextStatus = String(data.current_status || (enabled ? input.dataset.statusEnabled : input.dataset.statusDisabled) || "pending").toLowerCase();
+              currentStatus.className = statusClassFor(nextStatus);
+              currentStatus.textContent = labels[nextStatus] || nextStatus;
+            }
+            showBanner(messageBanner, data.message || "");
+          } catch (error) {
+            input.checked = !nextEnabled;
+            showBanner(errorBanner, error instanceof Error ? error.message : defaultError);
+          } finally {
+            input.disabled = false;
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
+{{end}}

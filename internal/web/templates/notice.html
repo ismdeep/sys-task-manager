@@ -1,0 +1,72 @@
+{{define "notice.html"}}
+<!DOCTYPE html>
+<html lang="{{htmlLang .Locale}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}}</title>
+  <style>
+    {{template "admin-shared-css" .}}
+
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top, rgba(16, 163, 127, 0.18), transparent 36%),
+        linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+    }
+
+    .notice-card {
+      width: min(100%, 520px);
+      padding: 32px;
+      border-radius: 28px;
+      background: rgba(255,255,255,0.88);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      box-shadow: 0 28px 70px rgba(15, 23, 42, 0.12);
+      text-align: center;
+    }
+
+    .notice-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #047857;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .notice-card h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(28px, 5vw, 36px);
+      color: var(--text);
+    }
+
+    .notice-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <section class="notice-card">
+    <div class="notice-pill">{{t .Locale "common.app_name"}}</div>
+    <h1>{{.Title}}</h1>
+    <p>{{tf .Locale "notice.redirecting"}}</p>
+  </section>
+  <script>
+    setTimeout(() => {
+      window.location.href = {{printf "%q" .RedirectURL}};
+    }, {{.RedirectIn}} * 1000);
+  </script>
+</body>
+</html>
+{{end}}

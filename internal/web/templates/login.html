@@ -1,0 +1,131 @@
+{{define "login.html"}}
+<!DOCTYPE html>
+<html lang="{{htmlLang .Locale}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{t .Locale "login.page_title"}}</title>
+  <style>
+    {{template "admin-shared-css" .}}
+
+    body {
+      overflow: auto;
+    }
+
+    .login-shell {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+    }
+
+    .login-main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+    }
+
+    .login-panel {
+      width: min(100%, 460px);
+      padding: 28px;
+    }
+
+    .login-panel h2 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      line-height: 1.1;
+    }
+
+    .login-copy {
+      margin: 0 0 22px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .field input {
+      width: 100%;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      background: var(--panel-strong);
+      border-radius: 16px;
+      padding: 12px 14px;
+      outline: none;
+      color: var(--text);
+    }
+
+    .field-hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    .login-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .login-status {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 960px) {
+      .login-shell,
+      .login-main {
+        padding: 24px;
+      }
+
+      .login-panel {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-shell">
+    <main class="login-main">
+      <section class="surface-card login-panel">
+        <h2>{{t .Locale "login.sign_in"}}</h2>
+        <p class="login-copy">{{t .Locale "login.copy"}}</p>
+        {{if .Error}}<div class="error">{{.Error}}</div>{{end}}
+        <form class="login-form" method="post" action="/login">
+          <label class="field">
+            <span>{{t .Locale "login.username"}}</span>
+            <input name="username" placeholder="{{t .Locale "login.username"}}" autocomplete="username" required>
+          </label>
+          <label class="field">
+            <span>{{t .Locale "login.password"}}</span>
+            <input type="password" name="password" placeholder="{{t .Locale "login.password"}}" autocomplete="current-password" required>
+          </label>
+          <div class="login-actions">
+            <span class="login-status">{{t .Locale "login.secure_access"}}</span>
+            <button type="submit">{{t .Locale "login.sign_in"}}</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
+{{end}}

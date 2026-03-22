@@ -3,3 +3,16 @@
 
 # macOS
 .DS_Store
+
+# build
+/build/
+
+# Go
+/.gocache/
+/.gomodcache/
+
+# data
+/data/
+
+# logs
+/logs/

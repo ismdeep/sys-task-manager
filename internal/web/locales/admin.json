@@ -1,0 +1,882 @@
+{
+  "common.app_name": {
+    "en": "Task Console",
+    "zh-CN": "任务控制台",
+    "zh-TW": "任務控制台"
+  },
+  "common.admin": {
+    "en": "Admin",
+    "zh-CN": "管理员",
+    "zh-TW": "管理員"
+  },
+  "common.setting": {
+    "en": "Settings",
+    "zh-CN": "设置",
+    "zh-TW": "設定"
+  },
+  "common.logout": {
+    "en": "Logout",
+    "zh-CN": "退出登录",
+    "zh-TW": "登出"
+  },
+  "common.back": {
+    "en": "Back",
+    "zh-CN": "返回",
+    "zh-TW": "返回"
+  },
+  "common.cancel": {
+    "en": "Cancel",
+    "zh-CN": "取消",
+    "zh-TW": "取消"
+  },
+  "common.create": {
+    "en": "Create",
+    "zh-CN": "创建",
+    "zh-TW": "建立"
+  },
+  "common.edit": {
+    "en": "Edit",
+    "zh-CN": "编辑",
+    "zh-TW": "編輯"
+  },
+  "common.delete": {
+    "en": "Delete",
+    "zh-CN": "删除",
+    "zh-TW": "刪除"
+  },
+  "common.confirm": {
+    "en": "Confirm",
+    "zh-CN": "确认",
+    "zh-TW": "確認"
+  },
+  "common.no_limit": {
+    "en": "No limit",
+    "zh-CN": "不限",
+    "zh-TW": "不限"
+  },
+  "common.not_available": {
+    "en": "-",
+    "zh-CN": "-",
+    "zh-TW": "-"
+  },
+  "settings.close": {
+    "en": "Close settings",
+    "zh-CN": "关闭设置",
+    "zh-TW": "關閉設定"
+  },
+  "settings.general": {
+    "en": "General",
+    "zh-CN": "常规",
+    "zh-TW": "常規"
+  },
+  "settings.security": {
+    "en": "Security",
+    "zh-CN": "安全",
+    "zh-TW": "安全性"
+  },
+  "settings.language": {
+    "en": "Language",
+    "zh-CN": "语言",
+    "zh-TW": "語言"
+  },
+  "settings.language_help": {
+    "en": "Choose the primary language used in the admin console. The selected option will be remembered for future visits.",
+    "zh-CN": "选择管理后台的主要显示语言。所选项会在后续访问中自动记住。",
+    "zh-TW": "選擇管理後台的主要顯示語言。所選項會在後續訪問中自動記住。"
+  },
+  "settings.password": {
+    "en": "Password",
+    "zh-CN": "密码",
+    "zh-TW": "密碼"
+  },
+  "settings.change_password": {
+    "en": "Change password",
+    "zh-CN": "修改密码",
+    "zh-TW": "修改密碼"
+  },
+  "settings.password_help": {
+    "en": "Update the admin password used to sign in to the console. Use at least 6 characters.",
+    "zh-CN": "更新用于登录控制台的后台密码。请至少使用 6 位字符。",
+    "zh-TW": "更新用於登入控制台的後台密碼。請至少使用 6 個字元。"
+  },
+  "settings.current_password": {
+    "en": "Current password",
+    "zh-CN": "当前密码",
+    "zh-TW": "目前密碼"
+  },
+  "settings.new_password": {
+    "en": "New password",
+    "zh-CN": "新密码",
+    "zh-TW": "新密碼"
+  },
+  "settings.confirm_password": {
+    "en": "Confirm password",
+    "zh-CN": "确认密码",
+    "zh-TW": "確認密碼"
+  },
+  "settings.update_password": {
+    "en": "Update Password",
+    "zh-CN": "更新密码",
+    "zh-TW": "更新密碼"
+  },
+  "settings.password_current_invalid": {
+    "en": "Current password is incorrect",
+    "zh-CN": "当前密码不正确",
+    "zh-TW": "目前密碼不正確"
+  },
+  "settings.password_too_short": {
+    "en": "New password must be at least 6 characters",
+    "zh-CN": "新密码至少需要 6 位字符",
+    "zh-TW": "新密碼至少需要 6 個字元"
+  },
+  "settings.password_confirm_mismatch": {
+    "en": "New password and confirmation do not match",
+    "zh-CN": "新密码与确认密码不一致",
+    "zh-TW": "新密碼與確認密碼不一致"
+  },
+  "settings.password_updated": {
+    "en": "Password updated",
+    "zh-CN": "密码已更新",
+    "zh-TW": "密碼已更新"
+  },
+  "settings.password_updated_title": {
+    "en": "Password Updated",
+    "zh-CN": "密码已更新",
+    "zh-TW": "密碼已更新"
+  },
+  "settings.password_user_not_found": {
+    "en": "Current user not found",
+    "zh-CN": "当前用户不存在",
+    "zh-TW": "目前使用者不存在"
+  },
+  "notice.redirecting": {
+    "en": "Redirecting to login in 3 seconds.",
+    "zh-CN": "将在 3 秒后跳转到登录页。",
+    "zh-TW": "將在 3 秒後跳轉到登入頁。"
+  },
+  "status.success": {
+    "en": "Success",
+    "zh-CN": "成功",
+    "zh-TW": "成功"
+  },
+  "status.failed": {
+    "en": "Failed",
+    "zh-CN": "失败",
+    "zh-TW": "失敗"
+  },
+  "status.running": {
+    "en": "Running",
+    "zh-CN": "运行中",
+    "zh-TW": "執行中"
+  },
+  "status.pending": {
+    "en": "Pending",
+    "zh-CN": "等待中",
+    "zh-TW": "等待中"
+  },
+  "status.disabled": {
+    "en": "Disabled",
+    "zh-CN": "已禁用",
+    "zh-TW": "已停用"
+  },
+  "status.never": {
+    "en": "Never",
+    "zh-CN": "从未",
+    "zh-TW": "從未"
+  },
+  "flash.invalid_form": {
+    "en": "Invalid form",
+    "zh-CN": "表单数据无效",
+    "zh-TW": "表單資料無效"
+  },
+  "flash.invalid_credentials": {
+    "en": "Invalid username or password",
+    "zh-CN": "用户名或密码错误",
+    "zh-TW": "使用者名稱或密碼錯誤"
+  },
+  "flash.task_created": {
+    "en": "Task created",
+    "zh-CN": "任务已创建",
+    "zh-TW": "任務已建立"
+  },
+  "flash.task_updated": {
+    "en": "Task updated",
+    "zh-CN": "任务已更新",
+    "zh-TW": "任務已更新"
+  },
+  "flash.task_enabled": {
+    "en": "Task enabled",
+    "zh-CN": "任务已启用",
+    "zh-TW": "任務已啟用"
+  },
+  "flash.task_disabled": {
+    "en": "Task disabled",
+    "zh-CN": "任务已禁用",
+    "zh-TW": "任務已停用"
+  },
+  "flash.invalid_delete_request": {
+    "en": "Invalid delete request",
+    "zh-CN": "删除请求无效",
+    "zh-TW": "刪除請求無效"
+  },
+  "flash.invalid_run_request": {
+    "en": "Invalid run request",
+    "zh-CN": "运行请求无效",
+    "zh-TW": "執行請求無效"
+  },
+  "flash.task_triggered": {
+    "en": "Task triggered",
+    "zh-CN": "任务已触发",
+    "zh-TW": "任務已觸發"
+  },
+  "flash.invalid_json_body": {
+    "en": "Invalid JSON body",
+    "zh-CN": "JSON 请求体无效",
+    "zh-TW": "JSON 請求內容無效"
+  },
+  "login.page_title": {
+    "en": "Task Manager Login",
+    "zh-CN": "任务管理登录",
+    "zh-TW": "任務管理登入"
+  },
+  "login.brand_intro": {
+    "en": "The unified admin theme starts at login and flows into the same task management, form, and run history experience after sign-in.",
+    "zh-CN": "统一的后台主题从登录开始生效，登录后会无缝进入同一套任务管理、表单页和运行记录页体验。",
+    "zh-TW": "統一的後台主題從登入開始生效，登入後會無縫進入同一套任務管理、表單頁與執行記錄頁體驗。"
+  },
+  "login.card_visual_title": {
+    "en": "Unified visuals",
+    "zh-CN": "统一视觉",
+    "zh-TW": "統一視覺"
+  },
+  "login.card_visual_body": {
+    "en": "The login, task list, form, and runs pages share one color system, card hierarchy, and button language.",
+    "zh-CN": "登录页、任务页、表单页、运行记录页共享同一套颜色变量、卡片层级和按钮规范。",
+    "zh-TW": "登入頁、任務頁、表單頁、執行記錄頁共享同一套色彩變數、卡片層級與按鈕規範。"
+  },
+  "login.card_focus_title": {
+    "en": "Focused operations",
+    "zh-CN": "聚焦管理",
+    "zh-TW": "聚焦管理"
+  },
+  "login.card_focus_body": {
+    "en": "After sign-in you can review task status, edit configs, and track recent executions and logs.",
+    "zh-CN": "登录后可以查看任务状态、编辑任务配置，并追踪最近执行记录与日志输出。",
+    "zh-TW": "登入後可以查看任務狀態、編輯任務設定，並追蹤最近執行記錄與日誌輸出。"
+  },
+  "login.note": {
+    "en": "Only authorized users can enter the task console.",
+    "zh-CN": "仅授权用户可以进入任务控制台。",
+    "zh-TW": "僅授權使用者可以進入任務控制台。"
+  },
+  "login.sign_in": {
+    "en": "Sign In",
+    "zh-CN": "登录",
+    "zh-TW": "登入"
+  },
+  "login.copy": {
+    "en": "Enter your admin username and password to access the task console.",
+    "zh-CN": "输入后台账号和密码，进入任务管理控制台。",
+    "zh-TW": "輸入後台帳號與密碼，進入任務管理控制台。"
+  },
+  "login.username": {
+    "en": "Username",
+    "zh-CN": "用户名",
+    "zh-TW": "使用者名稱"
+  },
+  "login.username_hint": {
+    "en": "Sign in with the assigned admin username.",
+    "zh-CN": "使用已分配的后台用户名登录。",
+    "zh-TW": "使用已分配的後台使用者名稱登入。"
+  },
+  "login.password": {
+    "en": "Password",
+    "zh-CN": "密码",
+    "zh-TW": "密碼"
+  },
+  "login.password_hint": {
+    "en": "After verification, you will be redirected to the task console.",
+    "zh-CN": "密码校验通过后将跳转到任务控制台。",
+    "zh-TW": "密碼驗證通過後將跳轉到任務控制台。"
+  },
+  "login.secure_access": {
+    "en": "Secure console access",
+    "zh-CN": "安全控制台访问",
+    "zh-TW": "安全控制台存取"
+  },
+  "tasks.page_title": {
+    "en": "Task Manager Console",
+    "zh-CN": "任务管理控制台",
+    "zh-TW": "任務管理控制台"
+  },
+  "tasks.sidebar_intro": {
+    "en": "Browse tasks conversationally from the left and inspect the full context and execution history on the right.",
+    "zh-CN": "管理控制台已切换为对话式浏览体验，左侧快速切换任务，右侧查看完整任务上下文与执行记录。",
+    "zh-TW": "管理控制台已切換為對話式瀏覽體驗，左側快速切換任務，右側查看完整任務內容與執行記錄。"
+  },
+  "tasks.create_task": {
+    "en": "Create Task",
+    "zh-CN": "创建任务",
+    "zh-TW": "建立任務"
+  },
+  "tasks.run_count": {
+    "en": "Runs %d",
+    "zh-CN": "执行次数 %d",
+    "zh-TW": "執行次數 %d"
+  },
+  "tasks.last_status": {
+    "en": "Last status %s",
+    "zh-CN": "最后状态 %s",
+    "zh-TW": "最後狀態 %s"
+  },
+  "tasks.run_as": {
+    "en": "Run as %s",
+    "zh-CN": "运行账户 %s",
+    "zh-TW": "執行帳號 %s"
+  },
+  "tasks.created_at": {
+    "en": "Created %s",
+    "zh-CN": "创建时间 %s",
+    "zh-TW": "建立時間 %s"
+  },
+  "tasks.created_time": {
+    "en": "Created Time",
+    "zh-CN": "创建时间",
+    "zh-TW": "建立時間"
+  },
+  "tasks.menu_settings": {
+    "en": "Settings",
+    "zh-CN": "设置",
+    "zh-TW": "設定"
+  },
+  "tasks.hero_intro": {
+    "en": "Review a task like a conversation thread: definition, recent status, and run history stay focused on the selected item.",
+    "zh-CN": "像查看一段对话上下文一样查看任务的定义、最近状态与运行历史。右侧信息聚焦当前选中任务，帮助快速定位问题与确认执行结果。",
+    "zh-TW": "像查看一段對話內容一樣查看任務定義、最近狀態與執行歷史。右側資訊聚焦目前選中的任務，幫助快速定位問題與確認結果。"
+  },
+  "tasks.edit_task": {
+    "en": "Edit Task",
+    "zh-CN": "编辑任务",
+    "zh-TW": "編輯任務"
+  },
+  "tasks.enable_task": {
+    "en": "Enable Task",
+    "zh-CN": "启用任务",
+    "zh-TW": "啟用任務"
+  },
+  "tasks.disable_task": {
+    "en": "Disable Task",
+    "zh-CN": "禁用任务",
+    "zh-TW": "停用任務"
+  },
+  "tasks.open_all_runs": {
+    "en": "Open All Runs",
+    "zh-CN": "查看全部运行记录",
+    "zh-TW": "查看全部執行記錄"
+  },
+  "tasks.delete_task": {
+    "en": "Delete Task",
+    "zh-CN": "删除任务",
+    "zh-TW": "刪除任務"
+  },
+  "tasks.delete_confirm": {
+    "en": "Delete task %s? This will also remove its run history.",
+    "zh-CN": "确定删除任务 %s 吗？这会同时删除运行记录。",
+    "zh-TW": "確定刪除任務 %s 嗎？這會同時刪除執行記錄。"
+  },
+  "tasks.overview": {
+    "en": "Task Overview",
+    "zh-CN": "任务概览",
+    "zh-TW": "任務概覽"
+  },
+  "tasks.type": {
+    "en": "Type",
+    "zh-CN": "类型",
+    "zh-TW": "類型"
+  },
+  "tasks.current_status": {
+    "en": "Current Status",
+    "zh-CN": "当前状态",
+    "zh-TW": "目前狀態"
+  },
+  "tasks.execution_count": {
+    "en": "Run Count",
+    "zh-CN": "执行次数",
+    "zh-TW": "執行次數"
+  },
+  "tasks.last_run_status": {
+    "en": "Last Run Status",
+    "zh-CN": "最后一次状态",
+    "zh-TW": "最後一次狀態"
+  },
+  "tasks.timeout": {
+    "en": "Timeout",
+    "zh-CN": "超时时间",
+    "zh-TW": "逾時時間"
+  },
+  "tasks.description": {
+    "en": "Description",
+    "zh-CN": "描述",
+    "zh-TW": "描述"
+  },
+  "tasks.run_now": {
+    "en": "Run Now",
+    "zh-CN": "立即执行",
+    "zh-TW": "立即執行"
+  },
+  "tasks.daemon_hint": {
+    "en": "Daemon tasks run continuously after the service starts and cannot be triggered manually.",
+    "zh-CN": "daemon 任务会在服务启动后按常驻模式运行，不支持手动触发。",
+    "zh-TW": "daemon 任務會在服務啟動後以常駐模式執行，不支援手動觸發。"
+  },
+  "tasks.run_button": {
+    "en": "Run Task",
+    "zh-CN": "执行任务",
+    "zh-TW": "執行任務"
+  },
+  "tasks.retry": {
+    "en": "Retry",
+    "zh-CN": "重试次数",
+    "zh-TW": "重試次數"
+  },
+  "tasks.cron_expr": {
+    "en": "Cron Expression",
+    "zh-CN": "Cron 表达式",
+    "zh-TW": "Cron 表達式"
+  },
+  "tasks.last_error": {
+    "en": "Last Error",
+    "zh-CN": "最后错误",
+    "zh-TW": "最後錯誤"
+  },
+  "tasks.command": {
+    "en": "Command",
+    "zh-CN": "命令内容",
+    "zh-TW": "命令內容"
+  },
+  "tasks.work_dir": {
+    "en": "Work Directory",
+    "zh-CN": "工作目录",
+    "zh-TW": "工作目錄"
+  },
+  "tasks.enabled_state": {
+    "en": "Enabled State",
+    "zh-CN": "启用状态",
+    "zh-TW": "啟用狀態"
+  },
+  "tasks.enabled": {
+    "en": "Enabled",
+    "zh-CN": "已启用",
+    "zh-TW": "已啟用"
+  },
+  "tasks.arguments_env": {
+    "en": "Args & Environment",
+    "zh-CN": "参数与环境变量",
+    "zh-TW": "參數與環境變數"
+  },
+  "tasks.args": {
+    "en": "Args",
+    "zh-CN": "参数",
+    "zh-TW": "參數"
+  },
+  "tasks.env": {
+    "en": "Env",
+    "zh-CN": "环境变量",
+    "zh-TW": "環境變數"
+  },
+  "tasks.run_history": {
+    "en": "Run History",
+    "zh-CN": "执行记录",
+    "zh-TW": "執行記錄"
+  },
+  "tasks.run_id": {
+    "en": "Run #%d",
+    "zh-CN": "运行 #%d",
+    "zh-TW": "執行 #%d"
+  },
+  "tasks.started_at": {
+    "en": "Started %s",
+    "zh-CN": "开始于 %s",
+    "zh-TW": "開始於 %s"
+  },
+  "tasks.duration": {
+    "en": "Duration %s",
+    "zh-CN": "持续 %s",
+    "zh-TW": "持續 %s"
+  },
+  "tasks.trigger": {
+    "en": "Trigger %s",
+    "zh-CN": "触发方式 %s",
+    "zh-TW": "觸發方式 %s"
+  },
+  "tasks.attempt": {
+    "en": "Attempt %d",
+    "zh-CN": "尝试次数 %d",
+    "zh-TW": "嘗試次數 %d"
+  },
+  "tasks.open_log": {
+    "en": "Open Log",
+    "zh-CN": "打开日志",
+    "zh-TW": "開啟日誌"
+  },
+  "tasks.no_runs": {
+    "en": "This task has no run history yet.",
+    "zh-CN": "当前任务还没有执行记录。",
+    "zh-TW": "目前任務還沒有執行記錄。"
+  },
+  "tasks.no_tasks_title": {
+    "en": "No tasks yet",
+    "zh-CN": "还没有任务",
+    "zh-TW": "還沒有任務"
+  },
+  "tasks.no_tasks_body": {
+    "en": "After you create a task, this area will show its type, timestamps, run count, last status, and recent history.",
+    "zh-CN": "创建一个任务后，这里会展示它的类型、创建时间、执行次数、最后状态以及执行记录。",
+    "zh-TW": "建立任務後，這裡會展示它的類型、建立時間、執行次數、最後狀態以及執行記錄。"
+  },
+  "tasks.run_failed": {
+    "en": "Run task failed",
+    "zh-CN": "执行任务失败",
+    "zh-TW": "執行任務失敗"
+  },
+  "tasks.toggle_failed": {
+    "en": "Update task state failed",
+    "zh-CN": "更新任务状态失败",
+    "zh-TW": "更新任務狀態失敗"
+  },
+  "confirm.title": {
+    "en": "Confirm action",
+    "zh-CN": "确认操作",
+    "zh-TW": "確認操作"
+  },
+  "confirm.message": {
+    "en": "Please confirm whether to continue.",
+    "zh-CN": "请确认是否继续。",
+    "zh-TW": "請確認是否繼續。"
+  },
+  "confirm.delete": {
+    "en": "Confirm delete",
+    "zh-CN": "确认删除",
+    "zh-TW": "確認刪除"
+  },
+  "confirm.continue": {
+    "en": "Continue with this action?",
+    "zh-CN": "确定继续该操作吗？",
+    "zh-TW": "確定繼續此操作嗎？"
+  },
+  "task_form.page_title_create": {
+    "en": "Create Task",
+    "zh-CN": "创建任务",
+    "zh-TW": "建立任務"
+  },
+  "task_form.page_title_edit": {
+    "en": "Edit Task",
+    "zh-CN": "编辑任务",
+    "zh-TW": "編輯任務"
+  },
+  "task_form.sidebar_intro": {
+    "en": "The form page now shares the same visual system as the main console so create, edit, and inspect flows feel continuous.",
+    "zh-CN": "表单页已与控制台主页面统一为同一套视觉风格，便于在创建、编辑和查看任务之间无缝切换。",
+    "zh-TW": "表單頁已與控制台主頁統一為同一套視覺風格，方便在建立、編輯與查看任務之間無縫切換。"
+  },
+  "task_form.back_to_tasks": {
+    "en": "Back to Tasks",
+    "zh-CN": "返回任务页",
+    "zh-TW": "返回任務頁"
+  },
+  "task_form.back_to_tasks_body": {
+    "en": "Return to the task console to switch tasks, inspect run history, and view logs.",
+    "zh-CN": "返回任务对话页，继续切换任务、查看运行记录和日志。",
+    "zh-TW": "返回任務頁，繼續切換任務、查看執行記錄與日誌。"
+  },
+  "task_form.edit_flow": {
+    "en": "Edit Flow",
+    "zh-CN": "编辑流程",
+    "zh-TW": "編輯流程"
+  },
+  "task_form.create_flow": {
+    "en": "Create Flow",
+    "zh-CN": "创建流程",
+    "zh-TW": "建立流程"
+  },
+  "task_form.editing_existing": {
+    "en": "Editing an existing task",
+    "zh-CN": "正在编辑现有任务",
+    "zh-TW": "正在編輯現有任務"
+  },
+  "task_form.creating_new": {
+    "en": "Creating a new task",
+    "zh-CN": "正在创建新任务",
+    "zh-TW": "正在建立新任務"
+  },
+  "task_form.upgrade_plan": {
+    "en": "Upgrade plan",
+    "zh-CN": "升级套餐",
+    "zh-TW": "升級方案"
+  },
+  "task_form.personalization": {
+    "en": "Personalization",
+    "zh-CN": "个性化",
+    "zh-TW": "個人化"
+  },
+  "task_form.profile": {
+    "en": "Profile",
+    "zh-CN": "个人资料",
+    "zh-TW": "個人資料"
+  },
+  "task_form.help": {
+    "en": "Help",
+    "zh-CN": "帮助",
+    "zh-TW": "幫助"
+  },
+  "task_form.hero_edit_title": {
+    "en": "Edit Task",
+    "zh-CN": "编辑任务",
+    "zh-TW": "編輯任務"
+  },
+  "task_form.hero_create_title": {
+    "en": "Create Task",
+    "zh-CN": "创建任务",
+    "zh-TW": "建立任務"
+  },
+  "task_form.hero_edit_body": {
+    "en": "Update the task type, command, run user, and parameter configuration here.",
+    "zh-CN": "在这里更新任务的执行类型、命令、运行账户和参数配置。",
+    "zh-TW": "在這裡更新任務的執行類型、命令、執行帳號與參數設定。"
+  },
+  "task_form.hero_create_body": {
+    "en": "Define a new task here, including type, execution mode, command content, and environment variables.",
+    "zh-CN": "在这里定义一个新的任务，包括类型、运行方式、命令内容和环境变量。",
+    "zh-TW": "在這裡定義一個新任務，包括類型、執行方式、命令內容與環境變數。"
+  },
+  "task_form.editing": {
+    "en": "Editing",
+    "zh-CN": "编辑中",
+    "zh-TW": "編輯中"
+  },
+  "task_form.new_task": {
+    "en": "New Task",
+    "zh-CN": "新任务",
+    "zh-TW": "新任務"
+  },
+  "task_form.basic_info": {
+    "en": "Basic Info",
+    "zh-CN": "基础信息",
+    "zh-TW": "基本資訊"
+  },
+  "task_form.basic_info_body": {
+    "en": "Define the task identity and execution mode first. Cron tasks need a cron expression; daemon and manual tasks can leave it empty.",
+    "zh-CN": "先定义任务的身份和运行方式。对于 cron 任务，请补充 Cron 表达式；对于 daemon 和 manual 任务，该字段可以留空。",
+    "zh-TW": "先定義任務的識別資訊與執行方式。對於 cron 任務，請補上 Cron 表達式；對於 daemon 和 manual 任務，此欄位可以留空。"
+  },
+  "task_form.name": {
+    "en": "Name",
+    "zh-CN": "名称",
+    "zh-TW": "名稱"
+  },
+  "task_form.name_edit_hint": {
+    "en": "Task names cannot be changed in edit mode.",
+    "zh-CN": "编辑模式下任务名称不可修改。",
+    "zh-TW": "編輯模式下任務名稱不可修改。"
+  },
+  "task_form.name_create_hint": {
+    "en": "Task names must be unique for routing and runtime identification.",
+    "zh-CN": "任务名称需要唯一，用于路由和运行时识别。",
+    "zh-TW": "任務名稱必須唯一，用於路由與執行時識別。"
+  },
+  "task_form.type_hint": {
+    "en": "`manual` runs on demand, `cron` supports schedule plus manual trigger, and `daemon` stays running.",
+    "zh-CN": "`manual` 仅手动触发，`cron` 支持定时执行和手动触发，`daemon` 常驻运行。",
+    "zh-TW": "`manual` 僅手動觸發，`cron` 支援排程與手動觸發，`daemon` 常駐執行。"
+  },
+  "task_form.run_as_hint": {
+    "en": "If left empty, it usually falls back to the current system user.",
+    "zh-CN": "留空时通常会回退为当前系统用户。",
+    "zh-TW": "留空時通常會回退為目前系統使用者。"
+  },
+  "task_form.cron_hint": {
+    "en": "Only required for cron tasks, for example once every 15 seconds.",
+    "zh-CN": "仅 cron 类型需要填写，例如每 15 秒执行一次。",
+    "zh-TW": "僅 cron 類型需要填寫，例如每 15 秒執行一次。"
+  },
+  "task_form.timeout_seconds": {
+    "en": "Timeout Seconds",
+    "zh-CN": "超时秒数",
+    "zh-TW": "逾時秒數"
+  },
+  "task_form.timeout_hint": {
+    "en": "0 means no timeout limit.",
+    "zh-CN": "0 表示不限制超时时间。",
+    "zh-TW": "0 表示不限制逾時時間。"
+  },
+  "task_form.retry_hint": {
+    "en": "How many times to retry after failure.",
+    "zh-CN": "任务失败后的重试次数。",
+    "zh-TW": "任務失敗後的重試次數。"
+  },
+  "task_form.description_hint": {
+    "en": "Add notes about what this task does, when to use it, or any operational context for future editing.",
+    "zh-CN": "补充任务用途、适用场景或运维备注，方便后续创建和编辑时快速理解。",
+    "zh-TW": "補充任務用途、適用情境或維運備註，方便後續建立與編輯時快速理解。"
+  },
+  "task_form.command_section": {
+    "en": "Command",
+    "zh-CN": "执行命令",
+    "zh-TW": "執行命令"
+  },
+  "task_form.command_section_body": {
+    "en": "Fill in the command and working directory here. Arguments and environment variables are maintained line by line below.",
+    "zh-CN": "填写要执行的命令和工作目录，命令参数与环境变量放在下面两个独立区域中逐行维护。",
+    "zh-TW": "填寫要執行的命令與工作目錄，命令參數與環境變數放在下方兩個獨立區塊逐行維護。"
+  },
+  "task_form.command_hint": {
+    "en": "For example `bash`, `python3`, or a script path.",
+    "zh-CN": "例如 `bash`、`python3` 或具体脚本路径。",
+    "zh-TW": "例如 `bash`、`python3` 或具體腳本路徑。"
+  },
+  "task_form.work_dir_hint": {
+    "en": "The working directory for the command, optional.",
+    "zh-CN": "命令执行时的工作目录，可留空。",
+    "zh-TW": "命令執行時的工作目錄，可留空。"
+  },
+  "task_form.args_body": {
+    "en": "One argument per line; it will be split into the argument array on submit.",
+    "zh-CN": "每行一个参数，提交后会按行切分为参数数组。",
+    "zh-TW": "每行一個參數，提交後會按行切分為參數陣列。"
+  },
+  "task_form.env_body": {
+    "en": "One environment variable per line, preferably in `KEY=value` format.",
+    "zh-CN": "每行一个环境变量，建议使用 `KEY=value` 格式。",
+    "zh-TW": "每行一個環境變數，建議使用 `KEY=value` 格式。"
+  },
+  "task_form.submit_section": {
+    "en": "Submit",
+    "zh-CN": "提交操作",
+    "zh-TW": "提交操作"
+  },
+  "task_form.submit_edit_body": {
+    "en": "Saving will update the current task configuration.",
+    "zh-CN": "保存后会更新当前任务配置。",
+    "zh-TW": "儲存後會更新目前任務設定。"
+  },
+  "task_form.submit_create_body": {
+    "en": "After creation you can return to the console, inspect the task, and run it manually.",
+    "zh-CN": "创建后可以立即回到任务控制台查看详情并手动运行。",
+    "zh-TW": "建立後可以立即回到任務控制台查看詳情並手動執行。"
+  },
+  "task_form.save_changes": {
+    "en": "Save Changes",
+    "zh-CN": "保存修改",
+    "zh-TW": "儲存變更"
+  },
+  "task_form.delete_section": {
+    "en": "Delete Task",
+    "zh-CN": "删除任务",
+    "zh-TW": "刪除任務"
+  },
+  "task_form.delete_body": {
+    "en": "Deleting will remove both the task config and its run records. If the task is running, the process is stopped before deletion continues.",
+    "zh-CN": "删除后会同时清除任务配置及其运行记录。若任务正在运行，系统会先停止后台进程，再继续删除任务。",
+    "zh-TW": "刪除後會同時清除任務設定及其執行記錄。若任務正在執行，系統會先停止背景程序，再繼續刪除任務。"
+  },
+  "runs.page_title": {
+    "en": "Task Runs",
+    "zh-CN": "任务运行记录",
+    "zh-TW": "任務執行記錄"
+  },
+  "runs.sidebar_intro": {
+    "en": "The runs page shares the same visual rules and components as the task list and task form.",
+    "zh-CN": "运行记录页已经接入统一后台主题，和任务列表、任务表单共享同一套视觉规则与组件样式。",
+    "zh-TW": "執行記錄頁已接入統一後台主題，與任務列表、任務表單共享同一套視覺規則與元件樣式。"
+  },
+  "runs.back_to_task": {
+    "en": "Back to Task",
+    "zh-CN": "返回任务详情",
+    "zh-TW": "返回任務詳情"
+  },
+  "runs.back_to_task_body": {
+    "en": "Return to the task detail page to keep reviewing config, status summary, and recent runs.",
+    "zh-CN": "返回任务详情页，继续查看配置、状态摘要与最近运行记录。",
+    "zh-TW": "返回任務詳情頁，繼續查看設定、狀態摘要與最近執行記錄。"
+  },
+  "runs.sidebar_body": {
+    "en": "This page shows the latest 50 runs for the task, including status, trigger, duration, and errors.",
+    "zh-CN": "这里展示该任务最近 50 次运行记录，包括状态、触发方式、耗时和错误信息。",
+    "zh-TW": "這裡展示該任務最近 50 次執行記錄，包括狀態、觸發方式、耗時與錯誤資訊。"
+  },
+  "runs.hero_title": {
+    "en": "Runs: %s",
+    "zh-CN": "运行记录：%s",
+    "zh-TW": "執行記錄：%s"
+  },
+  "runs.hero_body": {
+    "en": "Review task results in time order and quickly find failed batches, trigger sources, run users, and logs.",
+    "zh-CN": "按时间顺序查看任务运行结果，快速定位失败批次、触发来源、执行账户与日志入口。",
+    "zh-TW": "按時間順序查看任務執行結果，快速定位失敗批次、觸發來源、執行帳號與日誌入口。"
+  },
+  "runs.all_tasks": {
+    "en": "All Tasks",
+    "zh-CN": "全部任务",
+    "zh-TW": "全部任務"
+  },
+  "runs.recent_runs": {
+    "en": "Recent Runs",
+    "zh-CN": "最近运行记录",
+    "zh-TW": "最近執行記錄"
+  },
+  "runs.table_copy": {
+    "en": "This table reuses the same cards, buttons, and color tokens as the rest of the admin UI for future filters, pagination, or detail drawers.",
+    "zh-CN": "表格样式与后台其他页面共用同一组卡片、按钮和配色变量，后续扩展筛选、分页或详情弹层时可以继续复用。",
+    "zh-TW": "表格樣式與後台其他頁面共用同一組卡片、按鈕與配色變數，後續擴充篩選、分頁或詳情彈層時可以繼續復用。"
+  },
+  "runs.status": {
+    "en": "Status",
+    "zh-CN": "状态",
+    "zh-TW": "狀態"
+  },
+  "runs.trigger": {
+    "en": "Trigger",
+    "zh-CN": "触发方式",
+    "zh-TW": "觸發方式"
+  },
+  "runs.run_as": {
+    "en": "Run As",
+    "zh-CN": "执行账户",
+    "zh-TW": "執行帳號"
+  },
+  "runs.started": {
+    "en": "Started",
+    "zh-CN": "开始时间",
+    "zh-TW": "開始時間"
+  },
+  "runs.duration": {
+    "en": "Duration",
+    "zh-CN": "耗时",
+    "zh-TW": "耗時"
+  },
+  "runs.error": {
+    "en": "Error",
+    "zh-CN": "错误",
+    "zh-TW": "錯誤"
+  },
+  "runs.log": {
+    "en": "Log",
+    "zh-CN": "日志",
+    "zh-TW": "日誌"
+  },
+  "runs.open": {
+    "en": "Open",
+    "zh-CN": "打开",
+    "zh-TW": "開啟"
+  },
+  "runs.empty_title": {
+    "en": "No runs yet",
+    "zh-CN": "还没有运行记录",
+    "zh-TW": "還沒有執行記錄"
+  },
+  "runs.empty_body": {
+    "en": "Go back to the task page to trigger the task manually, or wait for the first scheduled execution.",
+    "zh-CN": "先回到任务页手动触发，或等待定时任务首次执行后再回来查看。",
+    "zh-TW": "先回到任務頁手動觸發，或等待排程任務首次執行後再回來查看。"
+  }
+}

@@ -1,0 +1,813 @@
+{{define "admin-shared-css"}}
+  :root {
+    --bg: #f3f4f6;
+    --panel: rgba(255, 255, 255, 0.84);
+    --panel-strong: #ffffff;
+    --sidebar: #111827;
+    --sidebar-muted: #94a3b8;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: rgba(148, 163, 184, 0.22);
+    --shadow: 0 24px 80px rgba(15, 23, 42, 0.12);
+    --accent: #10a37f;
+    --accent-soft: rgba(16, 163, 127, 0.14);
+    --danger: #dc2626;
+    --danger-soft: rgba(220, 38, 38, 0.12);
+    --warning: #d97706;
+    --warning-soft: rgba(217, 119, 6, 0.12);
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(circle at top left, rgba(16, 163, 127, 0.16), transparent 26%),
+      radial-gradient(circle at top right, rgba(15, 23, 42, 0.08), transparent 22%),
+      linear-gradient(180deg, #f8fafc 0%, var(--bg) 100%);
+    overflow: hidden;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    height: 100vh;
+  }
+
+  .sidebar {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0)),
+      var(--sidebar);
+    color: #f8fafc;
+    padding: 24px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .sidebar-main {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-height: 0;
+    flex: 1;
+  }
+
+  .sidebar-header,
+  .sidebar-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sidebar h1,
+  .sidebar-header h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .sidebar-copy,
+  .sidebar-meta {
+    color: var(--sidebar-muted);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .sidebar-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .nav-card {
+    display: block;
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .nav-card strong {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 15px;
+  }
+
+  .nav-card span {
+    display: block;
+    color: var(--sidebar-muted);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .button,
+  button,
+  input,
+  select,
+  textarea,
+  a {
+    font: inherit;
+  }
+
+  .button,
+  button {
+    border: 0;
+    border-radius: 14px;
+    padding: 12px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  }
+
+  .button:hover,
+  button:hover {
+    transform: translateY(-1px);
+  }
+
+  .button-primary,
+  button[type="submit"] {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(16, 163, 127, 0.24);
+  }
+
+  .button-secondary {
+    background: rgba(15, 23, 42, 0.06);
+    color: var(--text);
+  }
+
+  .button-danger,
+  button.button-danger,
+  button[type="submit"].button-danger {
+    background: var(--danger);
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(220, 38, 38, 0.22);
+  }
+
+  .sidebar .button-secondary {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+  }
+
+  .main {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 0;
+    overflow: auto;
+  }
+
+  .message,
+  .error,
+  .hero,
+  .panel,
+  .surface-card,
+  .empty-state {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    backdrop-filter: blur(16px);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .message,
+  .error {
+    padding: 14px 18px;
+  }
+
+  .message {
+    color: #027a48;
+  }
+
+  .error {
+    color: #b42318;
+  }
+
+  .flash-hidden {
+    display: none;
+  }
+
+  .hero {
+    padding: 26px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .hero h2 {
+    margin: 0 0 10px;
+    font-size: 30px;
+    line-height: 1.1;
+  }
+
+  .hero p,
+  .hero-subtitle {
+    margin: 0;
+    max-width: 760px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 8px;
+    position: relative;
+  }
+
+  .account-card {
+    padding: 12px 14px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.07);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+  }
+
+  .account-menu {
+    position: relative;
+  }
+
+  .account-trigger {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+    width: 100%;
+  }
+
+  .account-trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .account-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #f97316, #ea580c);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex: 0 0 auto;
+  }
+
+  .account-text {
+    min-width: 0;
+  }
+
+  .account-line {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .account-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  .account-meta {
+    font-size: 12px;
+    color: var(--sidebar-muted);
+    white-space: nowrap;
+  }
+
+  .account-dropdown {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(100% + 12px);
+    padding: 10px;
+    border-radius: 18px;
+    background: #3a3a3a;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 20;
+  }
+
+  .menu-form {
+    margin: 0;
+  }
+
+  .menu-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 2px 2px 6px;
+  }
+
+  .menu-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.12);
+    margin: 0;
+  }
+
+  .menu-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .menu-item {
+    width: 100%;
+    border: 0;
+    border-radius: 12px;
+    padding: 8px 10px;
+    background: transparent;
+    color: #fff;
+    text-align: left;
+    box-shadow: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 36px;
+  }
+
+  .menu-item:hover {
+    background: rgba(255,255,255,0.08);
+  }
+
+  .menu-icon {
+    width: 20px;
+    text-align: center;
+    color: rgba(255,255,255,0.92);
+    flex: 0 0 auto;
+  }
+
+  .menu-label {
+    flex: 1;
+  }
+
+  .menu-arrow {
+    color: rgba(255,255,255,0.7);
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .status-pill.success {
+    color: #047857;
+    background: var(--accent-soft);
+  }
+
+  .status-pill.failed {
+    color: var(--danger);
+    background: var(--danger-soft);
+  }
+
+  .status-pill.running {
+    color: var(--warning);
+    background: var(--warning-soft);
+  }
+
+  .status-pill.pending {
+    color: #475569;
+    background: rgba(148, 163, 184, 0.16);
+  }
+
+  .status-pill.disabled {
+    color: #64748b;
+    background: rgba(100, 116, 139, 0.14);
+  }
+
+  .confirm-dialog {
+    width: min(100% - 32px, 460px);
+    padding: 0;
+    border: 0;
+    border-radius: 24px;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .confirm-dialog::backdrop {
+    background: rgba(15, 23, 42, 0.48);
+    backdrop-filter: blur(6px);
+  }
+
+  .confirm-card {
+    padding: 24px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    backdrop-filter: blur(16px);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .confirm-card h3 {
+    margin: 0 0 12px;
+    font-size: 22px;
+    line-height: 1.2;
+  }
+
+  .confirm-card p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+  }
+
+  .settings-dialog {
+    width: min(100% - 32px, 1120px);
+    max-width: 1120px;
+    padding: 0;
+    border: 0;
+    border-radius: 28px;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .settings-dialog::backdrop {
+    background: rgba(15, 23, 42, 0.42);
+    backdrop-filter: blur(8px);
+  }
+
+  .settings-shell {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    min-height: min(82vh, 900px);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 28px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
+  }
+
+  .settings-sidebar {
+    background: linear-gradient(180deg, #fbfbfc 0%, #f5f6f8 100%);
+    padding: 24px 14px;
+    border-right: 1px solid rgba(148, 163, 184, 0.18);
+  }
+
+  .settings-close {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 14px;
+    background: transparent;
+    color: #111827;
+    box-shadow: none;
+    font-size: 28px;
+    line-height: 1;
+  }
+
+  .settings-close:hover {
+    background: rgba(15, 23, 42, 0.06);
+  }
+
+  .settings-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 26px;
+  }
+
+  .settings-nav-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 54px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 18px;
+    background: transparent;
+    color: #111827;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .settings-nav-item.active {
+    background: #ececec;
+  }
+
+  .settings-nav-item:hover {
+    background: rgba(15, 23, 42, 0.06);
+  }
+
+  .settings-nav-icon {
+    width: 24px;
+    text-align: center;
+    font-size: 18px;
+    flex: 0 0 auto;
+  }
+
+  .settings-main {
+    padding: 36px 32px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    overflow: auto;
+  }
+
+  .settings-title {
+    margin: 0;
+    font-size: 34px;
+    line-height: 1.1;
+    color: #111827;
+  }
+
+  .settings-panel {
+    border-top: 1px solid rgba(148, 163, 184, 0.22);
+  }
+
+  .settings-panel[hidden] {
+    display: none;
+  }
+
+  .settings-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: start;
+    padding: 34px 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  }
+
+  .settings-row-title {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.35;
+    color: #111827;
+  }
+
+  .settings-row-copy {
+    margin: 12px 0 0;
+    max-width: 520px;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .settings-select {
+    min-width: 220px;
+    border: 0;
+    border-radius: 14px;
+    background: transparent;
+    color: #111827;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 8px 36px 8px 12px;
+    outline: none;
+    box-shadow: none;
+    appearance: none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, #111827 50%),
+      linear-gradient(135deg, #111827 50%, transparent 50%);
+    background-position:
+      calc(100% - 18px) calc(50% - 3px),
+      calc(100% - 10px) calc(50% - 3px);
+    background-size: 8px 8px, 8px 8px;
+    background-repeat: no-repeat;
+  }
+
+  .settings-select-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 44px;
+  }
+
+  .settings-password-form {
+    grid-column: 1 / -1;
+    width: min(100%, 420px);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .settings-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .settings-field-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .settings-field input {
+    width: 100%;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 16px;
+    padding: 12px 14px;
+    background: #fff;
+    color: #111827;
+    outline: none;
+  }
+
+  .settings-submit {
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+
+  .settings-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #1d4ed8;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .settings-link:hover {
+    color: #1e40af;
+  }
+
+  .settings-password-form[hidden] {
+    display: none;
+  }
+
+  @media (max-width: 1100px) {
+    html,
+    body {
+      height: auto;
+    }
+
+    body {
+      overflow: auto;
+    }
+
+    .layout {
+      grid-template-columns: 1fr;
+      height: auto;
+    }
+
+    .hero {
+      flex-direction: column;
+    }
+
+    .sidebar,
+    .main {
+      overflow: visible;
+    }
+
+    .settings-shell {
+      grid-template-columns: 1fr;
+    }
+
+    .settings-sidebar {
+      border-right: 0;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .settings-main {
+      padding: 24px;
+    }
+
+    .settings-row {
+      grid-template-columns: 1fr;
+      padding: 24px 0;
+    }
+
+    .settings-select-wrap {
+      justify-content: flex-start;
+    }
+  }
+{{end}}
+{{define "admin-locale-switcher"}}
+  <div class="locale-switcher">
+    {{range .LocaleOptions}}
+    <a class="locale-chip{{if eq $.Locale .Code}} active{{end}}" href="{{withLang $.CurrentURL .Code}}">{{.Label}}</a>
+    {{end}}
+  </div>
+{{end}}
+{{define "admin-settings-locale-switcher"}}
+  <button type="button" class="menu-item" data-open-settings-dialog="1">
+    <span class="menu-icon">⚙</span>
+    <span class="menu-label">{{t .Locale "common.setting"}}</span>
+  </button>
+{{end}}
+{{define "admin-confirm-dialog"}}
+  <dialog class="confirm-dialog" id="confirm-dialog">
+    <div class="confirm-card">
+      <h3 id="confirm-dialog-title">{{t .Locale "confirm.title"}}</h3>
+      <p id="confirm-dialog-message">{{t .Locale "confirm.message"}}</p>
+      <div class="confirm-actions">
+        <button type="button" class="button button-secondary" id="confirm-dialog-cancel">{{t .Locale "common.cancel"}}</button>
+        <button type="button" class="button-danger" id="confirm-dialog-confirm">{{t .Locale "confirm.delete"}}</button>
+      </div>
+    </div>
+  </dialog>
+{{end}}
+{{define "admin-settings-dialog"}}
+  <dialog class="settings-dialog" id="settings-dialog">
+    <div class="settings-shell">
+      <aside class="settings-sidebar">
+        <button type="button" class="settings-close" id="settings-dialog-close" aria-label="{{t .Locale "settings.close"}}">×</button>
+        <div class="settings-nav">
+          <button type="button" class="settings-nav-item active" data-settings-tab-button="general" aria-selected="true">
+            <span class="settings-nav-icon">⚙</span>
+            <span>{{t .Locale "settings.general"}}</span>
+          </button>
+          <button type="button" class="settings-nav-item" data-settings-tab-button="security" aria-selected="false">
+            <span class="settings-nav-icon">🔒</span>
+            <span>{{t .Locale "settings.security"}}</span>
+          </button>
+        </div>
+      </aside>
+      <section class="settings-main">
+        <div class="settings-panel" data-settings-tab-panel="general">
+          <h2 class="settings-title">{{t .Locale "settings.general"}}</h2>
+          <div class="settings-row">
+            <div>
+              <h3 class="settings-row-title">{{t .Locale "settings.language"}}</h3>
+              <p class="settings-row-copy">{{t .Locale "settings.language_help"}}</p>
+            </div>
+            <div class="settings-select-wrap">
+              <select class="settings-select" id="settings-language-select" aria-label="{{t .Locale "settings.language"}}">
+                {{range .LocaleOptions}}
+                <option value="{{withLang $.CurrentURL .Code}}" {{if eq $.Locale .Code}}selected{{end}}>{{.Label}}</option>
+                {{end}}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="settings-panel" data-settings-tab-panel="security" hidden>
+          <h2 class="settings-title">{{t .Locale "settings.security"}}</h2>
+          <div class="settings-row">
+            <div>
+              <h3 class="settings-row-title">{{t .Locale "settings.password"}}</h3>
+              <p class="settings-row-copy">{{t .Locale "settings.password_help"}}</p>
+            </div>
+            <div class="settings-select-wrap">
+              <button type="button" class="settings-link" data-password-toggle>{{t .Locale "settings.change_password"}}</button>
+            </div>
+            <form method="post" action="/settings/password" class="settings-password-form" data-password-form hidden>
+              <input type="hidden" name="redirect_to" value="{{withParam .CurrentURL "settings" "password"}}">
+              <label class="settings-field">
+                <span class="settings-field-label">{{t .Locale "settings.current_password"}}</span>
+                <input type="password" name="current_password" autocomplete="current-password" required>
+              </label>
+              <label class="settings-field">
+                <span class="settings-field-label">{{t .Locale "settings.new_password"}}</span>
+                <input type="password" name="new_password" autocomplete="new-password" required>
+              </label>
+              <label class="settings-field">
+                <span class="settings-field-label">{{t .Locale "settings.confirm_password"}}</span>
+                <input type="password" name="confirm_password" autocomplete="new-password" required>
+              </label>
+              <button type="submit" class="settings-submit">{{t .Locale "settings.update_password"}}</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+  </dialog>
+{{end}}
