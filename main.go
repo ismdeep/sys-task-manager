@@ -9,7 +9,6 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
-	"strings"
 	"syscall"
 	"time"
 
@@ -24,12 +23,6 @@ import (
 	"github.com/ismdeep/sys-task-manager/internal/store"
 	"github.com/ismdeep/sys-task-manager/internal/task"
 	"github.com/ismdeep/sys-task-manager/internal/web"
-)
-
-const (
-	settingDefaultTaskCreatedCronWhoami      = "default_task_created.cron-whoami"
-	settingDefaultTaskCreatedDaemonHeartbeat = "default_task_created.daemon-heartbeat"
-	settingDefaultTaskCreatedManualSelfCheck = "default_task_created.manual-self-check"
 )
 
 func main() {
@@ -165,80 +158,49 @@ func main() {
 
 func seedExampleTasks(ctx context.Context, repo *repository.SQLiteRepository, authorize *auth.Authorizer) error {
 	current := authorize.Current()
-	defaultExamples := []struct {
-		settingKey string
-		task       task.Task
-	}{
+	defaultExamples := []task.Task{
 		{
-			settingKey: settingDefaultTaskCreatedDaemonHeartbeat,
-			task: task.Task{
-				Name:      "daemon-heartbeat",
-				Type:      task.TypeDaemon,
-				RunAsUser: current.Username,
-				Timeout:   0,
-				Retry:     0,
-				Enabled:   true,
-				Command: task.CommandSpec{
-					Command: "sh",
-					Args:    []string{"-c", "echo daemon-start:$USER; trap 'exit 0' TERM INT; while true; do sleep 60; done"},
-				},
+			Name:      "daemon-heartbeat",
+			Type:      task.TypeDaemon,
+			RunAsUser: current.Username,
+			Timeout:   0,
+			Retry:     0,
+			Enabled:   true,
+			Command: task.CommandSpec{
+				Command: "sh",
+				Args:    []string{"-c", "echo daemon-start:$USER; trap 'exit 0' TERM INT; while true; do sleep 60; done"},
 			},
 		},
 		{
-			settingKey: settingDefaultTaskCreatedCronWhoami,
-			task: task.Task{
-				Name:      "cron-whoami",
-				Type:      task.TypeCron,
-				RunAsUser: current.Username,
-				CronExpr:  "*/15 * * * * *",
-				Timeout:   5 * time.Second,
-				Retry:     0,
-				Enabled:   true,
-				Command: task.CommandSpec{
-					Command: "sh",
-					Args:    []string{"-c", "echo cron:$USER:$(date +%T)"},
-				},
+			Name:      "cron-whoami",
+			Type:      task.TypeCron,
+			RunAsUser: current.Username,
+			CronExpr:  "*/15 * * * * *",
+			Timeout:   5 * time.Second,
+			Retry:     0,
+			Enabled:   true,
+			Command: task.CommandSpec{
+				Command: "sh",
+				Args:    []string{"-c", "echo cron:$USER:$(date +%T)"},
 			},
 		},
 		{
-			settingKey: settingDefaultTaskCreatedManualSelfCheck,
-			task: task.Task{
-				Name:      "manual-self-check",
-				Type:      task.TypeManual,
-				RunAsUser: current.Username,
-				Timeout:   5 * time.Second,
-				Retry:     1,
-				Enabled:   true,
-				Command: task.CommandSpec{
-					Command: "sh",
-					Args:    []string{"-c", "echo manual:$USER && id"},
-				},
+			Name:      "manual-self-check",
+			Type:      task.TypeManual,
+			RunAsUser: current.Username,
+			Timeout:   5 * time.Second,
+			Retry:     1,
+			Enabled:   true,
+			Command: task.CommandSpec{
+				Command: "sh",
+				Args:    []string{"-c", "echo manual:$USER && id"},
 			},
 		},
 	}
-
-	for _, sample := range defaultExamples {
-		setting, err := repo.GetSetting(ctx, sample.settingKey)
-		if err == nil && setting.Value == "1" {
-			continue
-		}
-		if err != nil && !errors.Is(err, repository.ErrNotFound) {
-			return err
-		}
-
-		if _, err := repo.EnsureTask(ctx, sample.task); err != nil {
-			return err
-		}
-		if err := repo.SetSetting(ctx, sample.settingKey, "1"); err != nil {
-			return err
-		}
-	}
-
-	var examples []task.Task
 
 	if current.IsRoot {
 		if normalUser, ok := firstAvailableUser([]string{"nobody", "daemon", "ubuntu"}); ok {
-			examples = append(examples, task.Task{
+			defaultExamples = append(defaultExamples, task.Task{
 				Name:      "manual-root-task",
 				Type:      task.TypeManual,
 				RunAsUser: "root",
@@ -249,7 +211,7 @@ func seedExampleTasks(ctx context.Context, repo *repository.SQLiteRepository, au
 					Args:    []string{"-c", "echo root-task:$USER && id"},
 				},
 			})
-			examples = append(examples, task.Task{
+			defaultExamples = append(defaultExamples, task.Task{
 				Name:      "manual-run-as-normal-user",
 				Type:      task.TypeManual,
 				RunAsUser: normalUser,
@@ -264,8 +226,20 @@ func seedExampleTasks(ctx context.Context, repo *repository.SQLiteRepository, au
 		}
 	}
 
-	for _, sample := range examples {
+	for _, sample := range defaultExamples {
+		settingKey := fmt.Sprintf("default_task_created.%v", sample.Name)
+		setting, err := repo.GetSetting(ctx, settingKey)
+		if err == nil && setting.Value == "1" {
+			continue
+		}
+		if err != nil && !errors.Is(err, repository.ErrNotFound) {
+			return err
+		}
+
 		if _, err := repo.EnsureTask(ctx, sample); err != nil {
+			return err
+		}
+		if err := repo.SetSetting(ctx, settingKey, "1"); err != nil {
 			return err
 		}
 	}
@@ -296,12 +270,4 @@ func firstAvailableUser(candidates []string) (string, bool) {
 		}
 	}
 	return "", false
-}
-
-func getEnv(key, fallback string) string {
-	value := strings.TrimSpace(os.Getenv(key))
-	if value == "" {
-		return fallback
-	}
-	return value
 }
