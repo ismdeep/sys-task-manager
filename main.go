@@ -17,6 +17,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/ismdeep/sys-task-manager/internal/auth"
+	"github.com/ismdeep/sys-task-manager/internal/conf"
 	"github.com/ismdeep/sys-task-manager/internal/executor"
 	"github.com/ismdeep/sys-task-manager/internal/manager"
 	"github.com/ismdeep/sys-task-manager/internal/repository"
@@ -31,20 +32,22 @@ const (
 	settingDefaultTaskCreatedManualSelfCheck = "default_task_created.manual-self-check"
 )
 
-func init() {
-	log.Init("console://[stdout]?level=info&time_encoder=rfc3339&caller_encoder=short&trace_level=error")
-}
+func main() {
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
-func init() {
+	log.Init("console://[stdout]?level=info&time_encoder=rfc3339&caller_encoder=none&trace_level=error")
+
 	if err := validateRuntime(); err != nil {
 		log.WithContext(context.Background()).Warn("runtime validation failed", zap.Error(err))
 		os.Exit(1)
 	}
-}
 
-func main() {
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
+	// 加载配置
+	cfg, err := conf.Load()
+	if err != nil {
+		log.WithContext(ctx).Fatal("load configuration failed", zap.Error(err))
+	}
 
 	tempRunLogDir := filepath.Join(os.TempDir(), "sys-task-manager", "run-logs")
 	if err := os.MkdirAll(tempRunLogDir, 0o755); err != nil {
@@ -68,8 +71,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	adminUser := getEnv("TASK_MANAGER_ADMIN_USER", "admin")
-	adminPassword := getEnv("TASK_MANAGER_ADMIN_PASSWORD", "admin123")
+	adminUser := "admin"
+	adminPassword := "admin123"
 	adminHash, err := web.PasswordHash(adminPassword)
 	if err != nil {
 		log.WithContext(ctx).Error("hash admin password failed", zap.Error(err))
@@ -123,19 +126,12 @@ func main() {
 	}
 
 	httpServer := &http.Server{
-		Addr:              getEnv("TASK_MANAGER_ADDR", ":8080"),
+		Addr:              cfg.ServerAddr,
 		Handler:           webServer.Routes(),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
-	log.WithContext(ctx).Info(
-		"task manager started",
-		zap.String("addr", httpServer.Addr),
-		zap.String("login_url", "http://127.0.0.1"+httpServer.Addr+"/login"),
-		zap.String("admin_user", adminUser),
-		zap.String("default_admin_password", adminPassword),
-	)
-
+	log.WithContext(ctx).Info("task manager http server started", zap.String("addr", httpServer.Addr))
 	serverErr := make(chan error, 1)
 	go func() {
 		if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
