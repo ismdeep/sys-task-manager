@@ -1,6 +1,6 @@
 module github.com/ismdeep/sys-task-manager
 
-go 1.26.1
+go 1.26.5
 
 require (
 	github.com/ismdeep/log v0.2.2
