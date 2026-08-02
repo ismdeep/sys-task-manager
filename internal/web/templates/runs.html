@@ -21,23 +21,28 @@
     }
 
     .table-card {
-      padding: 22px;
+      padding: 14px;
     }
 
     .table-card h3 {
-      margin: 0 0 10px;
-      font-size: 18px;
+      margin: 0 0 8px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #334155;
     }
 
     .table-copy {
-      margin: 0 0 18px;
+      margin: 0 0 12px;
       color: var(--muted);
-      line-height: 1.7;
-      font-size: 14px;
+      line-height: 1.5;
+      font-size: 13px;
     }
 
     .table-wrap {
       overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
     }
 
     table {
@@ -49,21 +54,22 @@
     th,
     td {
       text-align: left;
-      padding: 14px 12px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--border);
       vertical-align: top;
-      font-size: 14px;
+      font-size: 12px;
     }
 
     th {
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       color: var(--muted);
+      background: var(--panel-muted);
     }
 
     tbody tr:hover {
-      background: rgba(15, 23, 42, 0.03);
+      background: #f8fafc;
     }
 
     .cell-mono {
@@ -79,7 +85,7 @@
     }
 
     .empty-state {
-      padding: 48px 32px;
+      padding: 32px 24px;
       text-align: center;
       color: var(--muted);
     }
@@ -178,7 +184,7 @@
 
       {{if .Runs}}
       <section class="surface-card table-card">
-        <h3>{{t .Locale "runs.recent_runs"}}</h3>
+        <h3>{{t .Locale "runs.runs"}}</h3>
         <p class="table-copy">{{t .Locale "runs.table_copy"}}</p>
         <div class="table-wrap">
           <table>
@@ -198,7 +204,7 @@
               {{range .Runs}}
               <tr>
                 <td class="cell-mono">{{.ID}}</td>
-                <td><span class="status-pill {{statusClass .Status}}">{{statusLabel $.Locale .Status}}</span></td>
+                <td><span class="status-pill {{statusClass (printf "%s" .Status)}}">{{statusLabel $.Locale (printf "%s" .Status)}}</span></td>
                 <td>{{.Trigger}}</td>
                 <td>{{.RunAsUser}}</td>
                 <td>{{formatTime .StartedAt}}</td>

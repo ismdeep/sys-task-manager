@@ -11,70 +11,95 @@
     .task-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 4px;
       min-height: 0;
       overflow: auto;
-      padding-right: 4px;
+      padding-right: 2px;
     }
 
     .task-link {
       display: block;
-      padding: 14px;
-      border-radius: 18px;
+      padding: 10px;
+      border-radius: 6px;
       color: #e5e7eb;
       text-decoration: none;
-      background: rgba(255,255,255,0.04);
+      background: transparent;
       border: 1px solid transparent;
-      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+      transition: background 0.14s ease, border-color 0.14s ease;
     }
 
     .task-link:hover {
-      transform: translateY(-1px);
-      background: rgba(255,255,255,0.08);
-      border-color: rgba(255,255,255,0.1);
+      transform: none;
+      background: rgba(148, 163, 184, 0.12);
+      border-color: rgba(148, 163, 184, 0.16);
     }
 
     .task-link.active {
-      background: linear-gradient(180deg, rgba(16, 163, 127, 0.28), rgba(16, 163, 127, 0.14));
-      border-color: rgba(16, 163, 127, 0.34);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      background: rgba(37, 99, 235, 0.18);
+      border-color: rgba(37, 99, 235, 0.42);
+      box-shadow: inset 3px 0 0 var(--accent);
     }
 
     .task-name-row {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
+      gap: 8px;
       align-items: center;
-      margin-bottom: 10px;
     }
 
     .task-name {
-      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 13px;
       font-weight: 600;
       color: #fff;
       word-break: break-word;
     }
 
-    .task-type {
-      font-size: 12px;
-      color: var(--sidebar-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+    .task-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
     }
 
-    .task-stats {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
+    .task-type-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 0.42);
       font-size: 12px;
-      color: var(--sidebar-muted);
+      line-height: 1;
+    }
+
+    .task-type-icon.cron {
+      color: #bfdbfe;
+      border-color: rgba(96, 165, 250, 0.35);
+    }
+
+    .task-type-icon.daemon {
+      color: #bbf7d0;
+      border-color: rgba(74, 222, 128, 0.35);
+    }
+
+    .task-type-icon.manual {
+      color: #fde68a;
+      border-color: rgba(251, 191, 36, 0.35);
     }
 
     .hero,
     .detail-card,
     .record-card,
     .empty-state {
-      border-radius: 24px;
+      border-radius: 8px;
     }
 
     .hero-actions {
@@ -96,11 +121,11 @@
     .toggle-switch {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.18);
-      background: rgba(255,255,255,0.76);
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-strong);
+      background: #fff;
       cursor: pointer;
       user-select: none;
       transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
@@ -108,7 +133,7 @@
 
     .toggle-switch:hover {
       border-color: rgba(16, 163, 127, 0.28);
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      box-shadow: none;
     }
 
     .switch-input {
@@ -119,8 +144,8 @@
 
     .switch-track {
       position: relative;
-      width: 52px;
-      height: 30px;
+      width: 38px;
+      height: 22px;
       border-radius: 999px;
       background: rgba(148, 163, 184, 0.42);
       transition: background 0.18s ease;
@@ -130,10 +155,10 @@
     .switch-track::after {
       content: "";
       position: absolute;
-      top: 4px;
-      left: 4px;
-      width: 22px;
-      height: 22px;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
       background: #fff;
       box-shadow: 0 6px 16px rgba(15, 23, 42, 0.22);
@@ -141,11 +166,11 @@
     }
 
     .switch-input:checked + .switch-track {
-      background: linear-gradient(135deg, #10a37f, #0f766e);
+      background: var(--success);
     }
 
     .switch-input:checked + .switch-track::after {
-      transform: translateX(22px);
+      transform: translateX(16px);
     }
 
     .switch-input:focus-visible + .switch-track {
@@ -168,40 +193,91 @@
     }
 
     .toggle-value {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--text);
     }
 
-    .summary-grid,
-    .detail-grid {
+    .summary-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
+      gap: 12px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1fr) minmax(360px, 1.3fr);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .runtime-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--border);
+    }
+
+    .runtime-item {
+      padding: 10px 12px;
+      background: #fff;
+    }
+
+    .runtime-item span {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .runtime-item strong {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 13px;
     }
 
     .detail-card {
-      padding: 22px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      box-shadow: var(--shadow);
     }
 
     .detail-card h3 {
-      margin: 0 0 16px;
-      font-size: 16px;
+      margin: 0 0 12px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #334155;
     }
 
     .kv-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px 18px;
+      gap: 10px 14px;
     }
 
     .kv-item span {
       display: block;
       font-size: 12px;
       color: var(--muted);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
+    }
+
+    .kv-item strong {
+      font-size: 13px;
+    }
+
+    .cell-mono {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+      word-break: break-word;
     }
 
     .kv-item strong,
@@ -212,15 +288,30 @@
     .mono-block,
     pre {
       margin: 0;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: rgba(15, 23, 42, 0.04);
-      border: 1px solid rgba(148, 163, 184, 0.14);
+      padding: 10px 12px;
+      border-radius: 6px;
+      background: var(--panel-muted);
+      border: 1px solid var(--border);
       color: #0f172a;
-      font-family: "SFMono-Regular", "SFMono-Regular", Consolas, monospace;
-      font-size: 13px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.55;
       white-space: pre-wrap;
       word-break: break-word;
+    }
+
+    .terminal-output {
+      min-height: 280px;
+      max-height: 46vh;
+      overflow: auto;
+      background: var(--terminal-bg);
+      border-color: #1e293b;
+      color: var(--terminal-text);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .full-width-card {
+      grid-column: 1 / -1;
     }
 
     .run-form {
@@ -240,11 +331,14 @@
     .records {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 8px;
     }
 
     .record-card {
-      padding: 20px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      background: #fff;
+      box-shadow: var(--shadow);
     }
 
     .record-header {
@@ -252,7 +346,7 @@
       justify-content: space-between;
       gap: 12px;
       align-items: flex-start;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
     .record-meta {
@@ -270,7 +364,7 @@
     }
 
     .empty-state {
-      padding: 48px 32px;
+      padding: 32px 24px;
       text-align: center;
       color: var(--muted);
     }
@@ -286,6 +380,7 @@
 
       .summary-grid,
       .detail-grid,
+      .runtime-grid,
       .kv-grid,
       .run-form {
         grid-template-columns: 1fr;
@@ -311,23 +406,27 @@
           {{range .Tasks}}
           <a class="task-link{{if .IsSelected}} active{{end}}" href="/tasks?task={{.Task.Name}}">
             <div class="task-name-row">
-              <div class="task-name">{{.Task.Name}}</div>
-              {{if .Task.Enabled}}
-                {{if .Status.Status}}
-                <span class="status-pill {{statusClass (printf "%s" .Status.Status)}}">{{statusLabel $.Locale (printf "%s" .Status.Status)}}</span>
+              <div class="task-name">
+                {{if eq .Task.Type "cron"}}
+                <span class="task-type-icon cron" title="cron" aria-label="cron">⏱</span>
+                {{else if eq .Task.Type "daemon"}}
+                <span class="task-type-icon daemon" title="daemon" aria-label="daemon">●</span>
                 {{else}}
-                <span class="status-pill {{statusClass "pending"}}">{{t $.Locale "status.pending"}}</span>
+                <span class="task-type-icon manual" title="manual" aria-label="manual">▶</span>
                 {{end}}
-              {{else}}
-              <span class="status-pill {{statusClass "disabled"}}">{{t $.Locale "status.disabled"}}</span>
-              {{end}}
-            </div>
-            <div class="task-type">{{.Task.Type}}</div>
-            <div class="task-stats">
-              <div>{{tf $.Locale "tasks.run_count" .RunCount}}</div>
-              <div>{{if .LastRun}}{{tf $.Locale "tasks.last_status" (statusLabel $.Locale (printf "%s" .LastRun.Status))}}{{else}}{{tf $.Locale "tasks.last_status" (t $.Locale "status.never")}}{{end}}</div>
-              <div>{{tf $.Locale "tasks.run_as" .Task.RunAsUser}}</div>
-              <div>{{tf $.Locale "tasks.created_at" (formatTime .Task.CreatedAt)}}</div>
+                <span>{{.Task.Name}}</span>
+              </div>
+              <div class="task-meta">
+                {{if .Task.Enabled}}
+                  {{if .Status.Status}}
+                  <span class="status-pill {{statusClass (printf "%s" .Status.Status)}}">{{statusLabel $.Locale (printf "%s" .Status.Status)}}</span>
+                  {{else}}
+                  <span class="status-pill {{statusClass "pending"}}">{{t $.Locale "status.pending"}}</span>
+                  {{end}}
+                {{else}}
+                <span class="status-pill {{statusClass "disabled"}}">{{t $.Locale "status.disabled"}}</span>
+                {{end}}
+              </div>
             </div>
           </a>
           {{end}}
@@ -405,7 +504,6 @@
             </span>
           </label>
           <a class="button button-secondary" href="/tasks/{{.SelectedTask.Task.Name}}/edit" target="_blank" rel="noopener">{{t .Locale "tasks.edit_task"}}</a>
-          <a class="button button-secondary" href="/tasks/{{.SelectedTask.Task.Name}}/runs">{{t .Locale "tasks.open_all_runs"}}</a>
           <form method="post" action="/tasks/{{.SelectedTask.Task.Name}}/delete" class="inline-form" data-confirm-delete="{{tf .Locale "tasks.delete_confirm" .SelectedTask.Task.Name}}">
             <input type="hidden" name="redirect_to" value="/tasks?task={{.SelectedTask.Task.Name}}">
             <button type="submit" class="button-danger">{{t .Locale "tasks.delete_task"}}</button>
@@ -422,124 +520,83 @@
               <strong>{{.SelectedTask.Task.Type}}</strong>
             </div>
             <div class="kv-item">
-              <span>{{t .Locale "tasks.current_status"}}</span>
-              <strong><span id="task-current-status" class="status-pill {{statusClass .SelectedTask.CurrentStatus}}">{{statusLabel .Locale .SelectedTask.CurrentStatus}}</span></strong>
+              <span>{{t .Locale "runs.run_as"}}</span>
+              <strong>{{.SelectedTask.Task.RunAsUser}}</strong>
             </div>
             <div class="kv-item">
               <span>{{t .Locale "tasks.created_time"}}</span>
               <strong>{{formatTime .SelectedTask.Task.CreatedAt}}</strong>
             </div>
+            {{if eq .SelectedTask.Task.Type "cron"}}
             <div class="kv-item">
-              <span>{{t .Locale "tasks.execution_count"}}</span>
-              <strong>{{.SelectedTask.RunCount}}</strong>
+              <span>{{t .Locale "tasks.cron_expr"}}</span>
+              <strong>{{.SelectedTask.Task.CronExpr}}</strong>
             </div>
-            <div class="kv-item">
-              <span>{{t .Locale "tasks.last_run_status"}}</span>
-              <strong><span class="status-pill {{statusClass .SelectedTask.LastStatus}}">{{statusLabel .Locale .SelectedTask.LastStatus}}</span></strong>
-            </div>
+            {{end}}
+            {{if ne .SelectedTask.Task.Type "daemon"}}
             <div class="kv-item">
               <span>{{t .Locale "tasks.timeout"}}</span>
               <strong>{{.SelectedTask.TimeoutText}}</strong>
             </div>
+            {{end}}
           </div>
         </article>
 
         <article class="detail-card">
-          <h3>{{t .Locale "tasks.run_now"}}</h3>
-          {{if eq .SelectedTask.Task.Type "daemon"}}
-          <p class="hero-subtitle" style="margin:0;">{{t .Locale "tasks.daemon_hint"}}</p>
-          {{else}}
-          <form method="post" action="/tasks/{{.SelectedTask.Task.Name}}/run" class="run-form" data-run-api="/api/tasks/{{.SelectedTask.Task.Name}}/run" data-run-error="{{t .Locale "tasks.run_failed"}}">
-            <button type="submit" data-default-label="{{t .Locale "tasks.run_button"}}">{{t .Locale "tasks.run_button"}}</button>
-          </form>
-          {{end}}
-          <div class="kv-grid" style="margin-top:16px;">
+          <h3>{{t .Locale "tasks.status"}}</h3>
+          <div class="kv-grid">
             <div class="kv-item">
-              <span>{{t .Locale "runs.run_as"}}</span>
-              <strong>{{.SelectedTask.Task.RunAsUser}}</strong>
+              <span>{{t .Locale "tasks.current_status"}}</span>
+              <strong><span id="task-current-status" class="status-pill {{statusClass .SelectedTask.CurrentStatus}}">{{statusLabel .Locale .SelectedTask.CurrentStatus}}</span></strong>
             </div>
+            {{if ne .SelectedTask.Task.Type "daemon"}}
             <div class="kv-item">
-              <span>{{t .Locale "tasks.retry"}}</span>
-              <strong>{{.SelectedTask.Task.Retry}}</strong>
+              <span>{{t .Locale "tasks.run_button"}}</span>
+              <form method="post" action="/tasks/{{.SelectedTask.Task.Name}}/run" class="run-form" data-run-api="/api/tasks/{{.SelectedTask.Task.Name}}/run" data-run-error="{{t .Locale "tasks.run_failed"}}">
+                <input type="hidden" name="async" value="1">
+                <button type="submit" data-default-label="{{t .Locale "tasks.run_button"}}">{{t .Locale "tasks.run_button"}}</button>
+              </form>
             </div>
-            <div class="kv-item">
-              <span>{{t .Locale "tasks.cron_expr"}}</span>
-              <strong>{{if .SelectedTask.Task.CronExpr}}{{.SelectedTask.Task.CronExpr}}{{else}}{{t .Locale "common.not_available"}}{{end}}</strong>
-            </div>
-            <div class="kv-item">
-              <span>{{t .Locale "tasks.last_error"}}</span>
-              <strong>{{.SelectedTask.LastErrorMessage}}</strong>
-            </div>
+            {{end}}
           </div>
         </article>
       </section>
+
+      {{if eq .SelectedTask.Task.Type "daemon"}}
+      <section class="runtime-grid" aria-label="Daemon runtime metrics">
+        <div class="runtime-item">
+          <span>PID</span>
+          <strong>{{if eq (printf "%s" .SelectedTask.Status.Status) "running"}}active{{else}}-{{end}}</strong>
+        </div>
+        <div class="runtime-item">
+          <span>CPU</span>
+          <strong>-</strong>
+        </div>
+        <div class="runtime-item">
+          <span>Memory</span>
+          <strong>-</strong>
+        </div>
+        <div class="runtime-item">
+          <span>Uptime</span>
+          <strong>{{if eq (printf "%s" .SelectedTask.Status.Status) "running"}}{{.SelectedTask.Status.Duration}}{{else}}-{{end}}</strong>
+        </div>
+        <div class="runtime-item">
+          <span>Restart Count</span>
+          <strong>-</strong>
+        </div>
+      </section>
+      {{end}}
 
       <section class="detail-grid">
-        <article class="detail-card">
-          <h3>{{t .Locale "tasks.description"}}</h3>
-          <pre>{{if .SelectedTask.DescriptionText}}{{.SelectedTask.DescriptionText}}{{else}}{{t .Locale "common.not_available"}}{{end}}</pre>
-        </article>
-
-        <article class="detail-card">
-          <h3>{{t .Locale "tasks.command"}}</h3>
-          <pre>{{.SelectedTask.CommandLine}}</pre>
-          <div class="kv-grid" style="margin-top:16px;">
-            <div class="kv-item">
-              <span>{{t .Locale "tasks.work_dir"}}</span>
-              <strong>{{if .SelectedTask.Task.Command.WorkDir}}{{.SelectedTask.Task.Command.WorkDir}}{{else}}{{t .Locale "common.not_available"}}{{end}}</strong>
-            </div>
-            <div class="kv-item">
-              <span>{{t .Locale "tasks.enabled_state"}}</span>
-              <strong id="task-enabled-state">{{if .SelectedTask.Task.Enabled}}{{t .Locale "tasks.enabled"}}{{else}}{{t .Locale "status.disabled"}}{{end}}</strong>
-            </div>
-          </div>
-        </article>
-
-        <article class="detail-card">
-          <h3>{{t .Locale "tasks.arguments_env"}}</h3>
-          <div style="display:flex;flex-direction:column;gap:14px;">
-            <div>
-              <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">{{t .Locale "tasks.args"}}</div>
-              <pre>{{if .SelectedTask.ArgumentsText}}{{.SelectedTask.ArgumentsText}}{{else}}{{t .Locale "common.not_available"}}{{end}}</pre>
-            </div>
-            <div>
-              <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">{{t .Locale "tasks.env"}}</div>
-              <pre>{{if .SelectedTask.EnvironmentText}}{{.SelectedTask.EnvironmentText}}{{else}}{{t .Locale "common.not_available"}}{{end}}</pre>
-            </div>
-          </div>
-        </article>
-      </section>
-
-      <section class="detail-card">
-        <h3>{{t .Locale "tasks.run_history"}}</h3>
-        {{if .SelectedTask.Runs}}
-        <div class="records">
-          {{range .SelectedTask.Runs}}
-          <article class="record-card">
-            <div class="record-header">
-              <div>
-                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                  <span class="status-pill {{statusClass (printf "%s" .Status)}}">{{statusLabel $.Locale (printf "%s" .Status)}}</span>
-                  <strong>{{tf $.Locale "tasks.run_id" .ID}}</strong>
-                </div>
-                <div class="record-meta" style="margin-top:10px;">
-                  <span>{{tf $.Locale "tasks.started_at" (formatTime .StartedAt)}}</span>
-                  <span>{{tf $.Locale "tasks.duration" (formatDurationMS .DurationMS)}}</span>
-                  <span>{{tf $.Locale "tasks.trigger" .Trigger}}</span>
-                  <span>{{tf $.Locale "tasks.run_as" .RunAsUser}}</span>
-                  <span>{{tf $.Locale "tasks.attempt" .Attempt}}</span>
-                </div>
-              </div>
-              {{if or .LogContent .LogPath}}<a href="/runs/{{.ID}}/log" target="_blank" rel="noopener">{{t $.Locale "tasks.open_log"}}</a>{{end}}
-            </div>
-            {{if .ErrorMsg}}<pre>{{.ErrorMsg}}</pre>{{end}}
-            {{if .LogContent}}<pre style="margin-top:12px;">{{.LogContent}}</pre>{{end}}
-          </article>
+        <article class="detail-card full-width-card">
+          <h3>stdout / stderr</h3>
+          {{if eq (printf "%s" .SelectedTask.Status.Status) "running"}}
+            <pre class="terminal-output" id="current-output" data-task-name="{{.SelectedTask.Task.Name}}">{{if .SelectedTask.CurrentOutput}}{{.SelectedTask.CurrentOutput}}{{else}}Waiting for output...{{end}}</pre>
+          {{else}}
+            <pre class="terminal-output" id="current-output" data-task-name="{{.SelectedTask.Task.Name}}">No task is running.</pre>
           {{end}}
-        </div>
-        {{else}}
-        <div class="empty-state">{{t .Locale "tasks.no_runs"}}</div>
-        {{end}}
+        </article>
+
       </section>
       {{else}}
       <div class="empty-state">
@@ -567,6 +624,7 @@
       const confirmDialogCancel = document.getElementById("confirm-dialog-cancel");
       const confirmDialogConfirm = document.getElementById("confirm-dialog-confirm");
       const defaultConfirmMessage = {{printf "%q" (t .Locale "confirm.continue")}};
+      const currentOutput = document.getElementById("current-output");
       let pendingDeleteForm = null;
 
       function showBanner(element, text) {
@@ -701,6 +759,7 @@
 
           const payload = {
             override_as: (form.querySelector('input[name="override_as"]')?.value || "").trim(),
+            async: true,
           };
 
           button.disabled = true;
@@ -732,6 +791,19 @@
           }
         });
       });
+
+      if (currentOutput?.dataset.taskName) {
+        const taskName = currentOutput.dataset.taskName;
+        const source = new EventSource(`/api/tasks/${encodeURIComponent(taskName)}/output/stream`);
+        source.addEventListener("output", (event) => {
+          try {
+            const payload = JSON.parse(event.data || "{}");
+            currentOutput.textContent = payload.running
+              ? (payload.output || "Waiting for output...")
+              : "No task is running.";
+          } catch (_) {}
+        });
+      }
 
       document.querySelectorAll(".switch-input[data-toggle-api]").forEach((input) => {
         const enabledValue = document.getElementById("task-enabled-value");
@@ -778,11 +850,11 @@
 
             const enabled = !!data.enabled;
             const labels = {
-              pending: {{t .Locale "status.pending"}},
-              running: {{t .Locale "status.running"}},
-              success: {{t .Locale "status.success"}},
-              failed: {{t .Locale "status.failed"}},
-              disabled: {{t .Locale "status.disabled"}},
+              pending: {{printf "%q" (t .Locale "status.pending")}},
+              running: {{printf "%q" (t .Locale "status.running")}},
+              success: {{printf "%q" (t .Locale "status.success")}},
+              failed: {{printf "%q" (t .Locale "status.failed")}},
+              disabled: {{printf "%q" (t .Locale "status.disabled")}},
             };
 
             input.checked = enabled;

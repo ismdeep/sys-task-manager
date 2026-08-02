@@ -6,7 +6,7 @@
 - 定时任务（Cron Task）
 - 手动任务（Manual Task）
 
-系统采用 Web 浏览器登录式管理，服务端统一调度任务；任务元数据、运行状态和登录会话存储到 `sqlite3`，任务执行日志和标准输出内容持久化到本地目录。当前核心实现已经覆盖 `RunAsUser` 权限模型、基于子进程的安全执行机制、超时与重试、重复执行保护、最大并发限制、任务状态跟踪，以及任务运行日志持久化。
+系统采用 Web 浏览器登录式管理，服务端统一调度任务；任务定义通过当前目录下的 `workspaces/<task-name>/config.json` 和 `run.sh` 管理，任务 stdout/stderr 和运行结果直接输出到 `sys-task-manager` 程序自身日志中。当前核心实现已经覆盖 `RunAsUser` 权限模型、基于子进程的安全执行机制、超时与重试、重复执行保护、最大并发限制、任务状态跟踪，以及进程内任务运行记录。
 
 ## 补充技术方案
 
@@ -19,55 +19,73 @@
   - 手动触发 `manual` / `cron` 任务
   - 查看任务运行状态
   - 查看最近执行记录
-  - 查看本地日志文件索引与下载入口
+  - 查看最近运行输出
 
 ### 2. 存储分层
 
-- `sqlite3`
-  - 存储任务定义
-  - 存储任务状态
-  - 存储任务执行历史元数据
-  - 存储管理员账户、密码摘要、会话信息
-- 本地目录日志
-  - 存储每次任务执行产生的 stdout/stderr 原始文本
-  - 存储运行日志文件索引，便于按任务、日期、执行批次归档
+- `workspaces/<task-name>/`
+  - `run.sh` 是任务实际执行脚本。
+  - `config.json` 描述任务类型、cron spec、超时、重试、执行用户和环境变量。
+- `data/`
+  - `users.json` 存储管理员账户和密码摘要。
+  - `settings.json` 存储本地设置。
+- 登录会话
+  - 保存在程序内存中，仅当前进程生命周期内有效，程序重启后需要重新登录。
+- 运行记录
+  - 保存在程序内存中，仅当前进程生命周期内可查，程序重启后清空。
 
 推荐目录结构：
 
 ```text
 data/
-├── task_manager.db
-└── logs/
-    ├── daemon-heartbeat/
-    │   └── 20260321-144247.log
-    ├── cron-whoami/
-    │   └── 20260321-145250.log
-    └── manual-self-check/
-        └── 20260321-144247.log
+├── settings.json
+└── users.json
+workspaces/
+└── hello-world/
+    ├── config.json
+    └── run.sh
 ```
 
-### 3. 为什么使用 sqlite3
+示例 `config.json`：
 
-- 单机部署简单，适合任务调度器这类本地系统服务
-- 无需额外数据库进程，降低运维复杂度
-- 支持事务，适合任务注册、状态更新、执行记录落库
-- 后续如果要升级到 MySQL/PostgreSQL，可以保持 repository 抽象不变
+```json
+{
+  "type": "cron",
+  "run_as_user": "ismdeep",
+  "cron": {
+    "spec": "*/15 * * * * *"
+  },
+  "timeout_seconds": 30,
+  "retry": 0,
+  "enabled": true
+}
+```
 
-### 4. 日志为什么放本地目录
+daemon 任务只需要设置 `type` 为 `daemon`。程序启动后会自动启动该任务；任务退出后会自动重启，直到任务被禁用、删除或服务关闭。
 
-- 任务输出通常是大文本，不适合完整存入 sqlite BLOB/TEXT
-- 文件方式更适合流式写入、归档、压缩和按日期清理
-- sqlite 中只保存日志路径、大小、执行批次等索引信息即可
+```json
+{
+  "type": "daemon",
+  "enabled": true
+}
+```
 
-### 5. 推荐的管理链路
+### 3. 日志策略
+
+- 任务 stdout/stderr 按行写入 `sys-task-manager` 程序自身日志。
+- 任务完成后，最终状态、耗时、执行用户、错误和保留输出摘要也写入程序自身日志。
+- 程序运行时不会生成每次运行的 `.log`、`.result` 或 `runs.json` 文件。
+- Web 页面上的运行记录来自当前进程内存，服务重启后不保留。
+
+### 4. 推荐的管理链路
 
 1. 浏览器访问 `/login`
 2. 服务端校验用户名和密码摘要
 3. 写入 session/cookie
 4. 登录后访问 `/tasks`
 5. 页面通过 HTTP API 调用任务管理服务
-6. 服务端把任务定义和状态写入 sqlite3
-7. 任务执行时把元数据写 sqlite3，把原始输出写本地日志目录
+6. 服务端把任务定义写入 `workspaces/<name>/config.json` 和 `run.sh`
+7. 任务执行时把 stdout/stderr 和运行结果写入 `sys-task-manager` 程序自身日志，运行记录摘要保存在当前进程内存中
 
 ## 架构设计
 
@@ -82,7 +100,8 @@ data/
 - `internal/web`
   - 提供浏览器登录、会话校验、任务管理页面和 HTTP API。
 - `internal/repository`
-  - 基于 `sqlite3` 持久化任务定义、任务状态、执行历史、管理员账号和登录会话。
+  - 基于本地文件持久化任务定义、管理员账号和本地设置。
+  - 登录会话和运行记录仅保存在进程内存中。
 - `internal/executor`
   - 使用 `exec.CommandContext` 创建子进程。
   - 使用 `SysProcAttr.Credential{Uid, Gid}` 按指定用户身份执行。
@@ -95,19 +114,19 @@ data/
   - 提供轻量级 cron 调度能力。
   - 当前支持 5 位或 6 位 cron 表达式，以及 `* /n range list` 等常见写法。
 - `internal/store`
-  - 将任务原始输出落到本地目录。
-  - 将日志路径、文件大小、执行批次号回写 sqlite3。
+  - 整理任务输出摘要。
+  - 将运行记录交给 repository 的内存记录区保存。
 
 ### 2. 任务执行链路
 
 1. 注册任务时先做结构校验。
 2. `auth.Authorizer` 对 `RunAsUser` 做权限校验。
 3. Web/API 层接收请求并调用 `manager.Manager`。
-4. `repository` 将任务定义、状态和执行记录写入 sqlite3。
+4. `repository` 将任务定义写入 workspace，将执行记录放入当前进程内存。
 5. 执行任务时构造 `context + timeout`。
 6. `executor.Executor` 启动子进程，并通过 `SysProcAttr.Credential` 设置 UID/GID。
-7. 执行输出写入本地日志目录，摘要与索引写回 sqlite3。
-8. 页面查询 sqlite3 中的任务状态和执行记录用于展示。
+7. 执行输出按行写入 `sys-task-manager` 程序自身日志，最终结果也写入程序自身日志。
+8. 页面查询 workspace 和当前进程内存中的运行记录用于展示。
 
 ### 3. 权限模型
 
@@ -127,8 +146,12 @@ data/
 ```text
 .
 ├── data
-│   ├── task_manager.db
-│   └── logs
+│   ├── settings.json
+│   └── users.json
+├── workspaces
+│   └── hello-world
+│       ├── config.json
+│       └── run.sh
 ├── go.mod
 ├── go.sum
 ├── main.go
@@ -140,7 +163,7 @@ data/
 │   ├── manager
 │   │   └── manager.go
 │   ├── repository
-│   │   └── sqlite.go
+│   │   └── file.go
 │   ├── scheduler
 │   │   └── scheduler.go
 │   ├── store
@@ -155,56 +178,30 @@ data/
 │           └── tasks.html
 ```
 
-### 建议的 sqlite3 表设计
+### Workspace 配置字段
 
-`users`
+`workspaces/<name>/config.json`
 
-- `id`
-- `username`
-- `password_hash`
-- `created_at`
-- `updated_at`
-
-`sessions`
-
-- `id`
-- `user_id`
-- `token`
-- `expired_at`
-- `created_at`
-
-`tasks`
-
-- `id`
-- `name`
+- `type`: `cron`、`daemon` 或 `manual`
 - `description`
-- `type`
 - `run_as_user`
-- `cron_expr`
-- `timeout_seconds`
-- `retry`
-- `command`
-- `args_json`
-- `work_dir`
-- `env_json`
 - `enabled`
-- `created_at`
-- `updated_at`
+- `timeout_seconds`: 仅对 `cron` / `manual` 生效，`daemon` 不使用 timeout
+- `retry`
+- `env`
+- `cron.spec`: cron 任务的表达式
+- `type = daemon` 时任务会随服务启动并持续运行，退出后自动重启
 
-`task_runs`
+`workspaces/<name>/run.sh`
 
-- `id`
-- `task_id`
-- `trigger_mode`
-- `run_as_user`
-- `status`
-- `attempt`
-- `started_at`
-- `finished_at`
-- `duration_ms`
-- `error_message`
-- `log_path`
-- `created_at`
+- 服务端会在该 workspace 目录中执行 `bash run.sh`
+- Web 新建任务时会创建默认脚本，之后可以直接编辑该文件
+
+任务运行输出
+
+- 每次任务运行的 stdout 和 stderr 会写入 `sys-task-manager` 程序自身日志
+- 首页显示当前正在执行任务的状态
+- 历史运行记录仍可通过单独的 runs 页面查看
 
 ### 当前已实现的 Web 管理接口
 
@@ -229,12 +226,12 @@ data/
 - `Timeout`
 - `Retry`
 
-同时补充了统一命令执行结构：
+执行命令固定映射为 workspace 脚本：
 
-- `Command.Command`
-- `Command.Args`
-- `Command.WorkDir`
-- `Command.Env`
+- `Command.Command = "bash"`
+- `Command.Args = ["run.sh"]`
+- `Command.WorkDir = "workspaces/<name>"`
+- `Command.Env` 来自 `config.json` 的 `env`
 
 ## 示例任务
 
@@ -269,11 +266,12 @@ go run .
 
 默认启动后：
 
-- HTTP 服务监听 `:8080`
+- HTTP 服务监听 `:46808`
 - 默认管理员账号：`admin`
 - 默认管理员密码：`admin123`
-- 示例任务会自动写入 `sqlite3`
-- 任务执行日志会写入 `data/logs/`
+- 示例任务会自动写入 `workspaces/`
+- 登录会话仅保存在当前进程内存中，重启后需要重新登录
+- 运行记录仅保存在当前进程内存中，重启后清空
 
 可通过环境变量覆盖：
 
@@ -287,7 +285,7 @@ go run .
 - 使用 goroutine + channel 做并发控制
 - 提供内置 cron scheduler，离线环境也可直接编译运行
 - 推荐以 Web 登录后台作为唯一管理入口
-- 推荐以 sqlite3 作为任务元数据和会话存储
-- 推荐以本地目录作为任务输出日志存储
+- 推荐以 workspace 目录作为任务定义来源
+- 推荐以 `data/*.json` 保存用户/设置，会话和运行记录只保存在进程内存中
 - 任务状态：`pending / running / success / failed`
-- 任务日志采用“数据库存索引 + 文件系统存内容”的组合方案
+- 任务日志输出到 `sys-task-manager` 程序自身日志，并在运行记录中保留尾部输出摘要

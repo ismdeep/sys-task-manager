@@ -3,8 +3,6 @@ package store
 import (
 	"context"
 	"fmt"
-	"io"
-	"os"
 	"strings"
 	"sync"
 
@@ -42,16 +40,9 @@ func (l *FileRunLogger) Write(result task.RunResult) error {
 	}
 
 	result.Output = content
-	result.LogPath = ""
 	if l.repo != nil {
 		if err := l.repo.SaveRun(context.Background(), result); err != nil {
 			return fmt.Errorf("persist task run: %w", err)
-		}
-	}
-
-	if result.TempLogPath != "" {
-		if err := os.Remove(result.TempLogPath); err != nil && !os.IsNotExist(err) {
-			return fmt.Errorf("remove temp log file: %w", err)
 		}
 	}
 
@@ -60,13 +51,6 @@ func (l *FileRunLogger) Write(result task.RunResult) error {
 
 func (l *FileRunLogger) readRetainedLog(result task.RunResult) (string, error) {
 	content := result.Output
-	if result.TempLogPath != "" {
-		raw, err := readLastBytes(result.TempLogPath, l.maxContentSize)
-		if err != nil {
-			return "", fmt.Errorf("read temp task log: %w", err)
-		}
-		content = string(raw)
-	}
 
 	if result.Err != nil && !strings.Contains(content, result.Err.Error()) {
 		if content != "" {
@@ -80,37 +64,4 @@ func (l *FileRunLogger) readRetainedLog(result task.RunResult) (string, error) {
 	}
 
 	return content, nil
-}
-
-func readLastBytes(path string, limit int64) ([]byte, error) {
-	if limit <= 0 {
-		return nil, nil
-	}
-
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	info, err := file.Stat()
-	if err != nil {
-		return nil, err
-	}
-
-	size := info.Size()
-	start := int64(0)
-	if size > limit {
-		start = size - limit
-	}
-
-	if _, err := file.Seek(start, io.SeekStart); err != nil {
-		return nil, err
-	}
-
-	data, err := io.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-	return data, nil
 }

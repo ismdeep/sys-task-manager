@@ -1,26 +1,31 @@
 package executor
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
+	"sync"
 	"syscall"
 	"time"
+
+	"github.com/ismdeep/log"
+	"go.uber.org/zap"
 
 	"github.com/ismdeep/sys-task-manager/internal/auth"
 	"github.com/ismdeep/sys-task-manager/internal/task"
 )
 
 type Executor struct {
-	auth   *auth.Authorizer
-	logDir string
+	auth *auth.Authorizer
 }
 
-func New(authz *auth.Authorizer, logDir string) *Executor {
-	return &Executor{auth: authz, logDir: logDir}
+func New(authz *auth.Authorizer, _ string) *Executor {
+	return &Executor{auth: authz}
 }
 
 func (e *Executor) Run(ctx context.Context, req task.RunRequest) (task.RunResult, error) {
@@ -31,7 +36,7 @@ func (e *Executor) Run(ctx context.Context, req task.RunRequest) (task.RunResult
 
 	runCtx := ctx
 	cancel := func() {}
-	if req.Task.Timeout > 0 {
+	if req.Task.Type != task.TypeDaemon && req.Task.Timeout > 0 {
 		runCtx, cancel = context.WithTimeout(ctx, req.Task.Timeout)
 	}
 	defer cancel()
@@ -40,7 +45,7 @@ func (e *Executor) Run(ctx context.Context, req task.RunRequest) (task.RunResult
 	var lastErr error
 
 	for attempt := 1; attempt <= req.Task.Retry+1; attempt++ {
-		lastResult, lastErr = e.runOnce(runCtx, req.Task, resolved, attempt)
+		lastResult, lastErr = e.runOnce(runCtx, req.Task, req.Trigger, req.RunID, resolved, attempt, req.OnUpdate)
 		if lastErr == nil {
 			return lastResult, nil
 		}
@@ -63,8 +68,11 @@ func pickRunAs(req task.RunRequest) string {
 func (e *Executor) runOnce(
 	ctx context.Context,
 	t task.Task,
+	trigger task.TriggerMode,
+	runID string,
 	resolved auth.ResolvedUser,
 	attempt int,
+	onUpdate func(task.RunResult),
 ) (task.RunResult, error) {
 	current := e.auth.Current()
 	startedAt := time.Now()
@@ -82,32 +90,47 @@ func (e *Executor) runOnce(
 		}
 	}
 
-	if err := os.MkdirAll(e.logDir, 0o755); err != nil {
-		return task.RunResult{}, fmt.Errorf("create temp log directory: %w", err)
+	if runID == "" {
+		runID = fmt.Sprintf("%d", startedAt.UnixNano())
 	}
 
-	logFile, err := os.CreateTemp(e.logDir, sanitizeFileName(t.Name)+"-attempt-*.log")
-	if err != nil {
-		return task.RunResult{}, fmt.Errorf("create temp log file: %w", err)
+	output := newTaskOutputCollector(t.Name, runID)
+	stdout := output.writer("stdout")
+	stderr := output.writer("stderr")
+	cmd.Stdout = stdout
+	cmd.Stderr = stderr
+
+	running := task.RunResult{
+		TaskName:  t.Name,
+		TaskType:  t.Type,
+		Trigger:   trigger,
+		RunAsUser: resolved.Username,
+		RunID:     runID,
+		StartedAt: startedAt,
+		Attempt:   attempt,
+		Status:    task.StatusRunning,
 	}
-	defer logFile.Close()
+	if onUpdate != nil {
+		onUpdate(running)
+	}
 
-	cmd.Stdout = logFile
-	cmd.Stderr = logFile
-
-	err = cmd.Run()
+	err := cmd.Run()
+	stdout.flush()
+	stderr.flush()
 	finishedAt := time.Now()
+	outputText := output.String()
 
 	result := task.RunResult{
-		TaskName:    t.Name,
-		TaskType:    t.Type,
-		Trigger:     task.TriggerMode(""),
-		RunAsUser:   resolved.Username,
-		StartedAt:   startedAt,
-		FinishedAt:  finishedAt,
-		Attempt:     attempt,
-		TempLogPath: logFile.Name(),
-		Status:      task.StatusSuccess,
+		TaskName:   t.Name,
+		TaskType:   t.Type,
+		Trigger:    trigger,
+		RunAsUser:  resolved.Username,
+		RunID:      runID,
+		StartedAt:  startedAt,
+		FinishedAt: finishedAt,
+		Attempt:    attempt,
+		Output:     outputText,
+		Status:     task.StatusSuccess,
 	}
 
 	if err == nil {
@@ -140,4 +163,91 @@ func sanitizeFileName(name string) string {
 	}
 
 	return filepath.Base(cleaned)
+}
+
+const maxTaskOutputSize = 1 << 20
+
+type taskOutputCollector struct {
+	taskName string
+	runID    string
+	maxSize  int
+
+	mu  sync.Mutex
+	buf []byte
+}
+
+type taskOutputWriter struct {
+	collector *taskOutputCollector
+	stream    string
+	partial   []byte
+}
+
+func newTaskOutputCollector(taskName, runID string) *taskOutputCollector {
+	return &taskOutputCollector{
+		taskName: taskName,
+		runID:    runID,
+		maxSize:  maxTaskOutputSize,
+	}
+}
+
+func (c *taskOutputCollector) writer(stream string) *taskOutputWriter {
+	return &taskOutputWriter{collector: c, stream: stream}
+}
+
+func (w *taskOutputWriter) Write(p []byte) (int, error) {
+	w.collector.append(p)
+	w.emit(p)
+	return len(p), nil
+}
+
+func (w *taskOutputWriter) flush() {
+	if len(w.partial) == 0 {
+		return
+	}
+	w.collector.logLine(w.stream, string(w.partial))
+	w.partial = nil
+}
+
+func (w *taskOutputWriter) emit(p []byte) {
+	for len(p) > 0 {
+		idx := bytes.IndexByte(p, '\n')
+		if idx < 0 {
+			w.partial = append(w.partial, p...)
+			return
+		}
+		line := append(w.partial, p[:idx]...)
+		w.partial = nil
+		w.collector.logLine(w.stream, string(line))
+		p = p[idx+1:]
+	}
+}
+
+func (c *taskOutputCollector) append(p []byte) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.buf = append(c.buf, p...)
+	if len(c.buf) > c.maxSize {
+		c.buf = append([]byte(nil), c.buf[len(c.buf)-c.maxSize:]...)
+	}
+}
+
+func (c *taskOutputCollector) String() string {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return string(c.buf)
+}
+
+func (c *taskOutputCollector) logLine(stream, line string) {
+	line = strings.TrimRight(line, "\r")
+	if line == "" {
+		return
+	}
+	log.WithContext(context.Background()).Info(
+		"task output",
+		zap.String("task", c.taskName),
+		zap.String("run_id", c.runID),
+		zap.String("stream", stream),
+		zap.String("output", line),
+	)
 }

@@ -42,21 +42,15 @@ func main() {
 		log.WithContext(ctx).Fatal("load configuration failed", zap.Error(err))
 	}
 
-	tempRunLogDir := filepath.Join(os.TempDir(), "sys-task-manager", "run-logs")
-	if err := os.MkdirAll(tempRunLogDir, 0o755); err != nil {
-		log.WithContext(ctx).Error("create temp log directory failed", zap.Error(err))
-		os.Exit(1)
-	}
-
-	repo, err := repository.NewSQLiteRepository(filepath.Join("data", "task_manager.db"))
+	repo, err := repository.NewRepository("data", "workspaces")
 	if err != nil {
-		log.WithContext(ctx).Error("init sqlite repository failed", zap.Error(err))
+		log.WithContext(ctx).Error("init repository failed", zap.Error(err))
 		os.Exit(1)
 	}
 	defer func() { _ = repo.Close() }()
 
 	if err := repo.Init(ctx); err != nil {
-		log.WithContext(ctx).Error("init database schema failed", zap.Error(err))
+		log.WithContext(ctx).Error("init repository storage failed", zap.Error(err))
 		os.Exit(1)
 	}
 	if err := repo.CleanupExpiredSessions(ctx); err != nil {
@@ -88,7 +82,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	mgr := manager.New(authorize, executor.New(authorize, tempRunLogDir), runLog, 4)
+	mgr := manager.New(authorize, executor.New(authorize, ""), runLog, 4)
 
 	if err := seedExampleTasks(ctx, repo, authorize); err != nil {
 		log.WithContext(ctx).Error("seed example tasks failed", zap.Error(err))
@@ -97,7 +91,7 @@ func main() {
 
 	tasks, err := repo.ListTasks(ctx)
 	if err != nil {
-		log.WithContext(ctx).Error("load tasks from database failed", zap.Error(err))
+		log.WithContext(ctx).Error("load tasks from workspaces failed", zap.Error(err))
 		os.Exit(1)
 	}
 	for _, item := range tasks {
@@ -156,7 +150,7 @@ func main() {
 	log.WithContext(ctx).Info("task manager stopped")
 }
 
-func seedExampleTasks(ctx context.Context, repo *repository.SQLiteRepository, authorize *auth.Authorizer) error {
+func seedExampleTasks(ctx context.Context, repo *repository.Repository, authorize *auth.Authorizer) error {
 	current := authorize.Current()
 	defaultExamples := []task.Task{
 		{
@@ -167,8 +161,9 @@ func seedExampleTasks(ctx context.Context, repo *repository.SQLiteRepository, au
 			Retry:     0,
 			Enabled:   true,
 			Command: task.CommandSpec{
-				Command: "sh",
-				Args:    []string{"-c", "echo daemon-start:$USER; trap 'exit 0' TERM INT; while true; do sleep 60; done"},
+				Command: "bash",
+				Args:    []string{"run.sh"},
+				Script:  "#!/usr/bin/env bash\nset -euo pipefail\necho daemon-start:$USER\ntrap 'exit 0' TERM INT\nwhile true; do sleep 60; done\n",
 			},
 		},
 		{
@@ -180,8 +175,9 @@ func seedExampleTasks(ctx context.Context, repo *repository.SQLiteRepository, au
 			Retry:     0,
 			Enabled:   true,
 			Command: task.CommandSpec{
-				Command: "sh",
-				Args:    []string{"-c", "echo cron:$USER:$(date +%T)"},
+				Command: "bash",
+				Args:    []string{"run.sh"},
+				Script:  "#!/usr/bin/env bash\nset -euo pipefail\necho cron:$USER:$(date +%T)\n",
 			},
 		},
 		{
@@ -192,8 +188,9 @@ func seedExampleTasks(ctx context.Context, repo *repository.SQLiteRepository, au
 			Retry:     1,
 			Enabled:   true,
 			Command: task.CommandSpec{
-				Command: "sh",
-				Args:    []string{"-c", "echo manual:$USER && id"},
+				Command: "bash",
+				Args:    []string{"run.sh"},
+				Script:  "#!/usr/bin/env bash\nset -euo pipefail\necho manual:$USER\nid\n",
 			},
 		},
 	}
@@ -207,8 +204,9 @@ func seedExampleTasks(ctx context.Context, repo *repository.SQLiteRepository, au
 				Timeout:   5 * time.Second,
 				Enabled:   true,
 				Command: task.CommandSpec{
-					Command: "sh",
-					Args:    []string{"-c", "echo root-task:$USER && id"},
+					Command: "bash",
+					Args:    []string{"run.sh"},
+					Script:  "#!/usr/bin/env bash\nset -euo pipefail\necho root-task:$USER\nid\n",
 				},
 			})
 			defaultExamples = append(defaultExamples, task.Task{
@@ -218,8 +216,9 @@ func seedExampleTasks(ctx context.Context, repo *repository.SQLiteRepository, au
 				Timeout:   5 * time.Second,
 				Enabled:   true,
 				Command: task.CommandSpec{
-					Command: "sh",
-					Args:    []string{"-c", "echo normal-user-task:$USER && id"},
+					Command: "bash",
+					Args:    []string{"run.sh"},
+					Script:  "#!/usr/bin/env bash\nset -euo pipefail\necho normal-user-task:$USER\nid\n",
 				},
 			})
 			log.WithContext(ctx).Info("root examples seeded", zap.String("normal_user", normalUser))
@@ -248,7 +247,7 @@ func seedExampleTasks(ctx context.Context, repo *repository.SQLiteRepository, au
 }
 
 func validateRuntime() error {
-	for _, bin := range []string{"sh", "id"} {
+	for _, bin := range []string{"bash", "id"} {
 		if _, err := exec.LookPath(bin); err != nil {
 			return fmt.Errorf("required binary %q not found: %w", bin, err)
 		}

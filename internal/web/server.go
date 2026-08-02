@@ -18,6 +18,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/ismdeep/log"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
@@ -31,7 +32,7 @@ const sessionCookieName = "task_manager_session"
 const flashCookieName = "task_manager_flash"
 
 type Server struct {
-	repo      *repository.SQLiteRepository
+	repo      *repository.Repository
 	manager   *manager.Manager
 	logger    *log.Logger
 	templates *template.Template
@@ -51,6 +52,32 @@ type noticePageData struct {
 	RedirectIn  int
 }
 
+type dashboardPageData struct {
+	pageMeta
+	Username string
+	Stats    dashboardStats
+	Tasks    []dashboardTaskView
+}
+
+type dashboardStats struct {
+	Total    int
+	Enabled  int
+	Disabled int
+	Running  int
+	Failed   int
+	Manual   int
+	Cron     int
+	Daemon   int
+	Runs     int
+}
+
+type dashboardTaskView struct {
+	Task          task.Task
+	CurrentStatus string
+	RunCount      int
+	LastRun       *repository.RunRecord
+}
+
 type tasksPageData struct {
 	pageMeta
 	Username         string
@@ -63,13 +90,14 @@ type tasksPageData struct {
 
 type taskFormPageData struct {
 	pageMeta
-	Username string
-	Message  string
-	Error    string
-	Mode     string
-	Task     task.Task
-	ArgsText string
-	EnvText  string
+	Username  string
+	Message   string
+	Error     string
+	Mode      string
+	Task      task.Task
+	ArgsText  string
+	EnvText   string
+	RunScript string
 }
 
 type runsPageData struct {
@@ -87,25 +115,16 @@ type taskView struct {
 type taskListItemView struct {
 	Task       task.Task
 	Status     task.RunResult
-	RunCount   int
-	LastRun    *repository.RunRecord
 	IsSelected bool
 }
 
 type taskDetailView struct {
-	Task             task.Task
-	Status           task.RunResult
-	RunCount         int
-	LastRun          *repository.RunRecord
-	Runs             []repository.RunRecord
-	CommandLine      string
-	DescriptionText  string
-	ArgumentsText    string
-	EnvironmentText  string
-	TimeoutText      string
-	CurrentStatus    string
-	LastStatus       string
-	LastErrorMessage string
+	Task            task.Task
+	Status          task.RunResult
+	DescriptionText string
+	CurrentOutput   string
+	TimeoutText     string
+	CurrentStatus   string
 }
 
 type runTaskAPIRequest struct {
@@ -129,7 +148,7 @@ type taskEnabledAPIResponse struct {
 	CurrentStatus string `json:"current_status,omitempty"`
 }
 
-func NewServer(repo *repository.SQLiteRepository, mgr *manager.Manager) (*Server, error) {
+func NewServer(repo *repository.Repository, mgr *manager.Manager) (*Server, error) {
 	i18n, err := loadTranslations()
 	if err != nil {
 		return nil, fmt.Errorf("load translations: %w", err)
@@ -212,24 +231,37 @@ func NewServer(repo *repository.SQLiteRepository, mgr *manager.Manager) (*Server
 }
 
 func (s *Server) Routes() http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /login", s.handleLoginPage)
-	mux.HandleFunc("POST /login", s.handleLogin)
-	mux.HandleFunc("POST /logout", s.requireAuth(s.handleLogout))
-	mux.HandleFunc("GET /", s.requireAuth(s.handleTasksPage))
-	mux.HandleFunc("GET /tasks", s.requireAuth(s.handleTasksPage))
-	mux.HandleFunc("GET /tasks/new", s.requireAuth(s.handleTaskCreatePage))
-	mux.HandleFunc("GET /tasks/{name}/edit", s.requireAuth(s.handleTaskEditPage))
-	mux.HandleFunc("POST /tasks", s.requireAuth(s.handleCreateTask))
-	mux.HandleFunc("POST /tasks/{name}/edit", s.requireAuth(s.handleUpdateTask))
-	mux.HandleFunc("POST /tasks/{name}/delete", s.requireAuth(s.handleDeleteTask))
-	mux.HandleFunc("POST /tasks/{name}/run", s.requireAuth(s.handleRunTask))
-	mux.HandleFunc("POST /api/tasks/{name}/run", s.requireAuth(s.handleRunTaskAPI))
-	mux.HandleFunc("PATCH /api/tasks/{name}/enabled", s.requireAuth(s.handleTaskEnabledAPI))
-	mux.HandleFunc("POST /settings/password", s.requireAuth(s.handleUpdatePassword))
-	mux.HandleFunc("GET /tasks/{name}/runs", s.requireAuth(s.handleRunsPage))
-	mux.HandleFunc("GET /runs/{id}/log", s.requireAuth(s.handleRunLog))
-	return mux
+	gin.SetMode(gin.ReleaseMode)
+
+	router := gin.New()
+	router.Use(gin.Recovery())
+	router.GET("/login", s.ginHandler(s.handleLoginPage))
+	router.POST("/login", s.ginHandler(s.handleLogin))
+	router.POST("/logout", s.ginHandler(s.requireAuth(s.handleLogout)))
+	router.GET("/", s.ginHandler(s.requireAuth(s.handleDashboardPage)))
+	router.GET("/tasks", s.ginHandler(s.requireAuth(s.handleTasksPage)))
+	router.GET("/tasks/new", s.ginHandler(s.requireAuth(s.handleTaskCreatePage)))
+	router.GET("/tasks/:name/edit", s.ginHandler(s.requireAuth(s.handleTaskEditPage)))
+	router.POST("/tasks", s.ginHandler(s.requireAuth(s.handleCreateTask)))
+	router.POST("/tasks/:name/edit", s.ginHandler(s.requireAuth(s.handleUpdateTask)))
+	router.POST("/tasks/:name/delete", s.ginHandler(s.requireAuth(s.handleDeleteTask)))
+	router.POST("/tasks/:name/run", s.ginHandler(s.requireAuth(s.handleRunTask)))
+	router.POST("/api/tasks/:name/run", s.ginHandler(s.requireAuth(s.handleRunTaskAPI)))
+	router.GET("/api/tasks/:name/output/stream", s.ginHandler(s.requireAuth(s.handleTaskOutputStream)))
+	router.PATCH("/api/tasks/:name/enabled", s.ginHandler(s.requireAuth(s.handleTaskEnabledAPI)))
+	router.POST("/settings/password", s.ginHandler(s.requireAuth(s.handleUpdatePassword)))
+	router.GET("/tasks/:name/runs", s.ginHandler(s.requireAuth(s.handleRunsPage)))
+	router.GET("/runs/:id/log", s.ginHandler(s.requireAuth(s.handleRunLog)))
+	return router
+}
+
+func (s *Server) ginHandler(next http.HandlerFunc) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		for _, param := range c.Params {
+			c.Request.SetPathValue(param.Key, param.Value)
+		}
+		next(c.Writer, c.Request)
+	}
 }
 
 func PasswordHash(password string) (string, error) {
@@ -291,7 +323,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 		Expires:  expiresAt,
 	})
 
-	http.Redirect(w, r, "/tasks", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
@@ -310,6 +342,68 @@ func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
+func (s *Server) handleDashboardPage(w http.ResponseWriter, r *http.Request) {
+	session, err := s.currentSession(r.Context(), r)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	tasks, err := s.repo.ListTasks(r.Context())
+	if err != nil {
+		http.Error(w, "cannot list tasks", http.StatusInternalServerError)
+		return
+	}
+	summaries, err := s.repo.ListTaskRunSummaries(r.Context())
+	if err != nil {
+		http.Error(w, "cannot list task run summaries", http.StatusInternalServerError)
+		return
+	}
+
+	stats := dashboardStats{Total: len(tasks)}
+	views := make([]dashboardTaskView, 0, len(tasks))
+	for _, item := range tasks {
+		status, _ := s.manager.Status(item.Name)
+		currentStatus := displayStatus(status.Status, item.Enabled)
+		summary := summaries[item.Name]
+
+		if item.Enabled {
+			stats.Enabled++
+		} else {
+			stats.Disabled++
+		}
+		switch item.Type {
+		case task.TypeManual:
+			stats.Manual++
+		case task.TypeCron:
+			stats.Cron++
+		case task.TypeDaemon:
+			stats.Daemon++
+		}
+		switch currentStatus {
+		case string(task.StatusRunning):
+			stats.Running++
+		case string(task.StatusFailed):
+			stats.Failed++
+		}
+		stats.Runs += summary.RunCount
+
+		views = append(views, dashboardTaskView{
+			Task:          item,
+			CurrentStatus: currentStatus,
+			RunCount:      summary.RunCount,
+			LastRun:       summary.LastRun,
+		})
+	}
+
+	s.render(w, r, "dashboard.html", dashboardPageData{
+		pageMeta: s.newPageMeta(w, r),
+		Username: session.Username,
+		Stats:    stats,
+		Tasks:    views,
+	})
+}
+
 func (s *Server) handleTasksPage(w http.ResponseWriter, r *http.Request) {
 	session, err := s.currentSession(r.Context(), r)
 	if err != nil {
@@ -323,13 +417,6 @@ func (s *Server) handleTasksPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "cannot list tasks", http.StatusInternalServerError)
 		return
 	}
-
-	summaries, err := s.repo.ListTaskRunSummaries(r.Context())
-	if err != nil {
-		http.Error(w, "cannot load task summaries", http.StatusInternalServerError)
-		return
-	}
-
 	selectedName := strings.TrimSpace(r.URL.Query().Get("task"))
 	if selectedName == "" && len(tasks) > 0 {
 		selectedName = tasks[0].Name
@@ -338,12 +425,9 @@ func (s *Server) handleTasksPage(w http.ResponseWriter, r *http.Request) {
 	views := make([]taskListItemView, 0, len(tasks))
 	for _, item := range tasks {
 		status, _ := s.manager.Status(item.Name)
-		summary := summaries[item.Name]
 		views = append(views, taskListItemView{
 			Task:       item,
 			Status:     status,
-			RunCount:   summary.RunCount,
-			LastRun:    summary.LastRun,
 			IsSelected: item.Name == selectedName,
 		})
 	}
@@ -355,26 +439,13 @@ func (s *Server) handleTasksPage(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 
-			runs, err := s.repo.ListRunsByTask(r.Context(), selectedName, 20)
-			if err != nil {
-				http.Error(w, "cannot load task runs", http.StatusInternalServerError)
-				return
-			}
-
 			selected = &taskDetailView{
-				Task:             item.Task,
-				Status:           item.Status,
-				RunCount:         item.RunCount,
-				LastRun:          item.LastRun,
-				Runs:             runs,
-				CommandLine:      commandLine(item.Task),
-				DescriptionText:  strings.TrimSpace(item.Task.Description),
-				ArgumentsText:    strings.Join(item.Task.Command.Args, "\n"),
-				EnvironmentText:  strings.Join(item.Task.Command.Env, "\n"),
-				TimeoutText:      formatTaskTimeout(s.resolveLocale(r), item.Task.Timeout, s.translate),
-				CurrentStatus:    displayStatus(item.Status.Status, item.Task.Enabled),
-				LastStatus:       displayLastRunStatus(item.LastRun),
-				LastErrorMessage: lastRunError(item.LastRun),
+				Task:            item.Task,
+				Status:          item.Status,
+				DescriptionText: strings.TrimSpace(item.Task.Description),
+				CurrentOutput:   currentOutput(item.Status),
+				TimeoutText:     formatTaskTimeout(s.resolveLocale(r), item.Task.Timeout, s.translate),
+				CurrentStatus:   displayStatus(item.Status.Status, item.Task.Enabled),
 			}
 			break
 		}
@@ -411,7 +482,13 @@ func (s *Server) handleTaskCreatePage(w http.ResponseWriter, r *http.Request) {
 			Enabled:   true,
 			RunAsUser: os.Getenv("USER"),
 			Timeout:   30 * time.Second,
+			Command: task.CommandSpec{
+				Command: "bash",
+				Args:    []string{"run.sh"},
+				Script:  "#!/usr/bin/env bash\nset -euo pipefail\n",
+			},
 		},
+		RunScript: "#!/usr/bin/env bash\nset -euo pipefail\n",
 	})
 }
 
@@ -430,14 +507,15 @@ func (s *Server) handleTaskEditPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.render(w, r, "task_form.html", taskFormPageData{
-		pageMeta: s.newPageMeta(w, r),
-		Username: session.Username,
-		Message:  message,
-		Error:    errorMessage,
-		Mode:     "edit",
-		Task:     item,
-		ArgsText: strings.Join(item.Command.Args, "\n"),
-		EnvText:  strings.Join(item.Command.Env, "\n"),
+		pageMeta:  s.newPageMeta(w, r),
+		Username:  session.Username,
+		Message:   message,
+		Error:     errorMessage,
+		Mode:      "edit",
+		Task:      item,
+		ArgsText:  strings.Join(item.Command.Args, "\n"),
+		EnvText:   strings.Join(item.Command.Env, "\n"),
+		RunScript: item.Command.Script,
 	})
 }
 
@@ -621,6 +699,56 @@ func (s *Server) handleTaskEnabledAPI(w http.ResponseWriter, r *http.Request) {
 		Enabled:       updated.Enabled,
 		CurrentStatus: displayStatus(status.Status, updated.Enabled),
 	})
+}
+
+func (s *Server) handleTaskOutputStream(w http.ResponseWriter, r *http.Request) {
+	if _, ok := s.manager.Status(r.PathValue("name")); !ok {
+		http.NotFound(w, r)
+		return
+	}
+
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "streaming unsupported", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("X-Accel-Buffering", "no")
+
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+
+	lastPayload := ""
+	for {
+		status, ok := s.manager.Status(r.PathValue("name"))
+		payload, err := json.Marshal(struct {
+			Running bool   `json:"running"`
+			Output  string `json:"output"`
+		}{
+			Running: ok && status.Status == task.StatusRunning,
+			Output:  currentOutput(status),
+		})
+		if err != nil {
+			return
+		}
+
+		if string(payload) != lastPayload {
+			if _, err := fmt.Fprintf(w, "event: output\ndata: %s\n\n", payload); err != nil {
+				return
+			}
+			flusher.Flush()
+			lastPayload = string(payload)
+		}
+
+		select {
+		case <-r.Context().Done():
+			return
+		case <-ticker.C:
+		}
+	}
 }
 
 func (s *Server) handleRunsPage(w http.ResponseWriter, r *http.Request) {
@@ -815,23 +943,25 @@ func buildTaskFromForm(r *http.Request, enabled bool) task.Task {
 		Retry:       retry,
 		Enabled:     enabled,
 		Command: task.CommandSpec{
-			Command: strings.TrimSpace(r.FormValue("command")),
-			Args:    splitLines(r.FormValue("args")),
-			WorkDir: strings.TrimSpace(r.FormValue("work_dir")),
+			Command: "bash",
+			Args:    []string{"run.sh"},
 			Env:     splitLines(r.FormValue("env")),
+			Script:  r.FormValue("run_script"),
 		},
 	}
 
 	if item.RunAsUser == "" {
 		item.RunAsUser = os.Getenv("USER")
 	}
+	if item.Type == task.TypeDaemon {
+		item.Timeout = 0
+		item.Daemon = task.DaemonConfig{Autostart: true, Restart: "always"}
+	}
+	if item.Command.Command == "" {
+		item.Command.Command = "bash"
+		item.Command.Args = []string{"run.sh"}
+	}
 	return item
-}
-
-func commandLine(item task.Task) string {
-	parts := []string{item.Command.Command}
-	parts = append(parts, item.Command.Args...)
-	return strings.TrimSpace(strings.Join(parts, " "))
 }
 
 func displayStatus(status task.Status, enabled bool) string {
@@ -844,18 +974,27 @@ func displayStatus(status task.Status, enabled bool) string {
 	return string(status)
 }
 
-func displayLastRunStatus(run *repository.RunRecord) string {
-	if run == nil {
-		return "never"
+func currentOutput(result task.RunResult) string {
+	if result.Status != task.StatusRunning {
+		return ""
 	}
-	return string(run.Status)
-}
+	logPath := result.LogPath
+	if logPath == "" {
+		logPath = result.TempLogPath
+	}
+	if logPath == "" {
+		return ""
+	}
 
-func lastRunError(run *repository.RunRecord) string {
-	if run == nil || strings.TrimSpace(run.ErrorMsg) == "" {
-		return "-"
+	raw, err := os.ReadFile(logPath)
+	if err != nil {
+		return ""
 	}
-	return run.ErrorMsg
+	const limit = 1 << 20
+	if len(raw) > limit {
+		raw = raw[len(raw)-limit:]
+	}
+	return string(raw)
 }
 
 func sanitizedRedirectTarget(r *http.Request) string {

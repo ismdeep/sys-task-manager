@@ -139,6 +139,40 @@ func TestRunManualRejectsDaemonTask(t *testing.T) {
 	}
 }
 
+func TestStartStartsEnabledDaemonWithoutDaemonConfig(t *testing.T) {
+	runner := &blockingRunner{
+		started: make(chan task.RunRequest, 1),
+		stopped: make(chan struct{}, 1),
+	}
+	runLogger := &stubRunLogger{}
+	mgr := newTestManager(t, runner, runLogger)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	item := task.Task{
+		Name:    "daemon-startup",
+		Type:    task.TypeDaemon,
+		Enabled: true,
+		Command: task.CommandSpec{Command: "sleep", Args: []string{"1"}},
+	}
+	if err := mgr.Register(item); err != nil {
+		t.Fatalf("register task: %v", err)
+	}
+	if err := mgr.Start(ctx); err != nil {
+		t.Fatalf("start manager: %v", err)
+	}
+
+	select {
+	case req := <-runner.started:
+		if req.Trigger != task.TriggerDaemon {
+			t.Fatalf("trigger = %q, want %q", req.Trigger, task.TriggerDaemon)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("expected daemon to start on manager startup")
+	}
+}
+
 func TestReplaceStartsDaemonWhenEnabled(t *testing.T) {
 	runner := &blockingRunner{
 		started: make(chan task.RunRequest, 1),

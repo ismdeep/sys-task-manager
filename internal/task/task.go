@@ -28,6 +28,12 @@ type CommandSpec struct {
 	Args    []string
 	WorkDir string
 	Env     []string
+	Script  string
+}
+
+type DaemonConfig struct {
+	Autostart bool
+	Restart   string
 }
 
 type Task struct {
@@ -41,6 +47,7 @@ type Task struct {
 	Timeout     time.Duration
 	Retry       int
 	Enabled     bool
+	Daemon      DaemonConfig
 	Command     CommandSpec
 }
 
@@ -49,6 +56,7 @@ type RunResult struct {
 	TaskType    Type
 	Trigger     TriggerMode
 	RunAsUser   string
+	RunID       string
 	Status      Status
 	StartedAt   time.Time
 	FinishedAt  time.Time
@@ -78,6 +86,8 @@ type RunRequest struct {
 	Task       Task
 	Trigger    TriggerMode
 	OverrideAs string
+	RunID      string
+	OnUpdate   func(RunResult)
 }
 
 type Runner interface {
@@ -98,6 +108,10 @@ func (t Task) Validate() error {
 		return errors.New("only cron task can define cron expression")
 	case t.Retry < 0:
 		return errors.New("retry must be greater than or equal to 0")
+	case t.Type != TypeDaemon && t.Daemon.Restart != "":
+		return errors.New("only daemon task can define daemon restart policy")
+	case t.Type == TypeDaemon && t.Daemon.Restart != "" && t.Daemon.Restart != "always":
+		return errors.New("daemon restart must be always when configured")
 	}
 
 	if !t.Enabled {

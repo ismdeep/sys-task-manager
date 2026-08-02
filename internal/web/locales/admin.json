@@ -59,6 +59,111 @@
     "zh-CN": "-",
     "zh-TW": "-"
   },
+  "dashboard.page_title": {
+    "en": "Task Console",
+    "zh-CN": "任务控制台",
+    "zh-TW": "任務控制台"
+  },
+  "dashboard.sidebar_intro": {
+    "en": "Monitor task health, execution state, and workload distribution.",
+    "zh-CN": "集中查看任务健康度、执行状态与任务类型分布。",
+    "zh-TW": "集中查看任務健康度、執行狀態與任務類型分布。"
+  },
+  "dashboard.tasks_nav": {
+    "en": "Task Management",
+    "zh-CN": "任务管理",
+    "zh-TW": "任務管理"
+  },
+  "dashboard.tasks_nav_body": {
+    "en": "Open the task list to switch tasks, trigger runs, and edit definitions.",
+    "zh-CN": "进入任务列表，切换任务、触发执行并编辑定义。",
+    "zh-TW": "進入任務列表，切換任務、觸發執行並編輯定義。"
+  },
+  "dashboard.create_nav": {
+    "en": "Create Task",
+    "zh-CN": "创建任务",
+    "zh-TW": "建立任務"
+  },
+  "dashboard.create_nav_body": {
+    "en": "Add a manual, cron, or daemon task.",
+    "zh-CN": "新增 manual、cron 或 daemon 任务。",
+    "zh-TW": "新增 manual、cron 或 daemon 任務。"
+  },
+  "dashboard.hero_title": {
+    "en": "System Dashboard",
+    "zh-CN": "系统看板",
+    "zh-TW": "系統看板"
+  },
+  "dashboard.hero_body": {
+    "en": "Review the current task fleet at a glance: health, type mix, run volume, and task-level status.",
+    "zh-CN": "总览当前任务集合的健康状态、类型构成、运行次数与任务级状态。",
+    "zh-TW": "總覽目前任務集合的健康狀態、類型構成、執行次數與任務級狀態。"
+  },
+  "dashboard.total_tasks": {
+    "en": "Total Tasks",
+    "zh-CN": "任务总数",
+    "zh-TW": "任務總數"
+  },
+  "dashboard.running_tasks": {
+    "en": "Running",
+    "zh-CN": "运行中",
+    "zh-TW": "執行中"
+  },
+  "dashboard.failed_tasks": {
+    "en": "Failed",
+    "zh-CN": "失败",
+    "zh-TW": "失敗"
+  },
+  "dashboard.disabled_tasks": {
+    "en": "Disabled",
+    "zh-CN": "已禁用",
+    "zh-TW": "已停用"
+  },
+  "dashboard.enabled_tasks": {
+    "en": "Enabled Tasks",
+    "zh-CN": "启用任务",
+    "zh-TW": "啟用任務"
+  },
+  "dashboard.total_runs": {
+    "en": "Total Runs",
+    "zh-CN": "运行总数",
+    "zh-TW": "執行總數"
+  },
+  "dashboard.type_distribution": {
+    "en": "Type Distribution",
+    "zh-CN": "类型分布",
+    "zh-TW": "類型分布"
+  },
+  "dashboard.task_health": {
+    "en": "Task Health",
+    "zh-CN": "任务健康",
+    "zh-TW": "任務健康"
+  },
+  "dashboard.task_table": {
+    "en": "Task Status",
+    "zh-CN": "任务状态",
+    "zh-TW": "任務狀態"
+  },
+  "dashboard.task_name": {
+    "en": "Task Name",
+    "zh-CN": "任务名称",
+    "zh-TW": "任務名稱"
+  },
+  "dashboard.run_count": {
+    "en": "Runs",
+    "zh-CN": "运行次数",
+    "zh-TW": "執行次數"
+  },
+  "dashboard.last_run": {
+    "en": "Last Run",
+    "zh-CN": "最后运行",
+    "zh-TW": "最後執行"
+  },
+  "dashboard.empty_tasks": {
+    "en": "No tasks have been created yet.",
+    "zh-CN": "还没有创建任务。",
+    "zh-TW": "尚未建立任務。"
+  },
   "settings.close": {
     "en": "Close settings",
     "zh-CN": "关闭设置",
@@ -260,9 +365,9 @@
     "zh-TW": "聚焦管理"
   },
   "login.card_focus_body": {
-    "en": "After sign-in you can review task status, edit configs, and track recent executions and logs.",
-    "zh-CN": "登录后可以查看任务状态、编辑任务配置，并追踪最近执行记录与日志输出。",
-    "zh-TW": "登入後可以查看任務狀態、編輯任務設定，並追蹤最近執行記錄與日誌輸出。"
+    "en": "After sign-in you can review task status, edit configs, and track executions and logs.",
+    "zh-CN": "登录后可以查看任务状态、编辑任务配置，并追踪执行记录与日志输出。",
+    "zh-TW": "登入後可以查看任務狀態、編輯任務設定，並追蹤執行記錄與日誌輸出。"
   },
   "login.note": {
     "en": "Only authorized users can enter the task console.",
@@ -350,9 +455,9 @@
     "zh-TW": "設定"
   },
   "tasks.hero_intro": {
-    "en": "Review a task like a conversation thread: definition, recent status, and run history stay focused on the selected item.",
-    "zh-CN": "像查看一段对话上下文一样查看任务的定义、最近状态与运行历史。右侧信息聚焦当前选中任务，帮助快速定位问题与确认执行结果。",
-    "zh-TW": "像查看一段對話內容一樣查看任務定義、最近狀態與執行歷史。右側資訊聚焦目前選中的任務，幫助快速定位問題與確認結果。"
+    "en": "Review a task like a conversation thread: definition and status stay focused on the selected item.",
+    "zh-CN": "像查看一段对话上下文一样查看任务的定义与状态。右侧信息聚焦当前选中任务，帮助快速定位问题与确认执行结果。",
+    "zh-TW": "像查看一段對話內容一樣查看任務定義與狀態。右側資訊聚焦目前選中的任務，幫助快速定位問題與確認結果。"
   },
   "tasks.edit_task": {
     "en": "Edit Task",
@@ -368,11 +473,6 @@
     "en": "Disable Task",
     "zh-CN": "禁用任务",
     "zh-TW": "停用任務"
-  },
-  "tasks.open_all_runs": {
-    "en": "Open All Runs",
-    "zh-CN": "查看全部运行记录",
-    "zh-TW": "查看全部執行記錄"
   },
   "tasks.delete_task": {
     "en": "Delete Task",
@@ -399,6 +499,11 @@
     "zh-CN": "当前状态",
     "zh-TW": "目前狀態"
   },
+  "tasks.status": {
+    "en": "Task Status",
+    "zh-CN": "任务状态",
+    "zh-TW": "任務狀態"
+  },
   "tasks.execution_count": {
     "en": "Run Count",
     "zh-CN": "执行次数",
@@ -418,16 +523,6 @@
     "en": "Description",
     "zh-CN": "描述",
     "zh-TW": "描述"
-  },
-  "tasks.run_now": {
-    "en": "Run Now",
-    "zh-CN": "立即执行",
-    "zh-TW": "立即執行"
-  },
-  "tasks.daemon_hint": {
-    "en": "Daemon tasks run continuously after the service starts and cannot be triggered manually.",
-    "zh-CN": "daemon 任务会在服务启动后按常驻模式运行，不支持手动触发。",
-    "zh-TW": "daemon 任務會在服務啟動後以常駐模式執行，不支援手動觸發。"
   },
   "tasks.run_button": {
     "en": "Run Task",
@@ -530,9 +625,9 @@
     "zh-TW": "還沒有任務"
   },
   "tasks.no_tasks_body": {
-    "en": "After you create a task, this area will show its type, timestamps, run count, last status, and recent history.",
-    "zh-CN": "创建一个任务后，这里会展示它的类型、创建时间、执行次数、最后状态以及执行记录。",
-    "zh-TW": "建立任務後，這裡會展示它的類型、建立時間、執行次數、最後狀態以及執行記錄。"
+    "en": "After you create a task, this area will show its type, timestamps, run count, and last status.",
+    "zh-CN": "创建一个任务后，这里会展示它的类型、创建时间、执行次数与最后状态。",
+    "zh-TW": "建立任務後，這裡會展示它的類型、建立時間、執行次數與最後狀態。"
   },
   "tasks.run_failed": {
     "en": "Run task failed",
@@ -795,14 +890,14 @@
     "zh-TW": "返回任務詳情"
   },
   "runs.back_to_task_body": {
-    "en": "Return to the task detail page to keep reviewing config, status summary, and recent runs.",
-    "zh-CN": "返回任务详情页，继续查看配置、状态摘要与最近运行记录。",
-    "zh-TW": "返回任務詳情頁，繼續查看設定、狀態摘要與最近執行記錄。"
+    "en": "Return to the task detail page to keep reviewing config and status summary.",
+    "zh-CN": "返回任务详情页，继续查看配置与状态摘要。",
+    "zh-TW": "返回任務詳情頁，繼續查看設定與狀態摘要。"
   },
   "runs.sidebar_body": {
-    "en": "This page shows the latest 50 runs for the task, including status, trigger, duration, and errors.",
-    "zh-CN": "这里展示该任务最近 50 次运行记录，包括状态、触发方式、耗时和错误信息。",
-    "zh-TW": "這裡展示該任務最近 50 次執行記錄，包括狀態、觸發方式、耗時與錯誤資訊。"
+    "en": "This page shows task runs, including status, trigger, duration, and errors.",
+    "zh-CN": "这里展示该任务运行记录，包括状态、触发方式、耗时和错误信息。",
+    "zh-TW": "這裡展示該任務執行記錄，包括狀態、觸發方式、耗時與錯誤資訊。"
   },
   "runs.hero_title": {
     "en": "Runs: %s",
@@ -819,10 +914,10 @@
     "zh-CN": "全部任务",
     "zh-TW": "全部任務"
   },
-  "runs.recent_runs": {
-    "en": "Recent Runs",
-    "zh-CN": "最近运行记录",
-    "zh-TW": "最近執行記錄"
+  "runs.runs": {
+    "en": "Runs",
+    "zh-CN": "运行记录",
+    "zh-TW": "執行記錄"
   },
   "runs.table_copy": {
     "en": "This table reuses the same cards, buttons, and color tokens as the rest of the admin UI for future filters, pagination, or detail drawers.",

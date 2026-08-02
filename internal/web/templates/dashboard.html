@@ -1,0 +1,357 @@
+{{define "dashboard.html"}}
+<!DOCTYPE html>
+<html lang="{{htmlLang .Locale}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{t .Locale "dashboard.page_title"}}</title>
+  <style>
+    {{template "admin-shared-css" .}}
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric-card,
+    .dashboard-card {
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .metric-card span,
+    .dashboard-card h3 {
+      display: block;
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .metric-card strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .dashboard-main-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.35fr);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .type-list,
+    .health-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .type-row,
+    .health-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .type-row:last-child,
+    .health-row:last-child {
+      border-bottom: 0;
+    }
+
+    .type-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .type-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--panel-muted);
+      color: var(--text);
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: middle;
+      font-size: 12px;
+    }
+
+    th {
+      color: var(--muted);
+      background: var(--panel-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .task-link-inline {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+      word-break: break-word;
+    }
+
+    .cell-mono {
+      font-family: "SFMono-Regular", Consolas, monospace;
+    }
+
+    @media (max-width: 1100px) {
+      .layout,
+      .dashboard-main-grid,
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-main">
+        <div class="sidebar-header">
+          <div>
+            <h1>{{t .Locale "common.app_name"}}</h1>
+            <div class="sidebar-meta">{{t .Locale "dashboard.sidebar_intro"}}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="account-card">
+          <details class="account-menu">
+            <summary class="account-trigger">
+              <div class="account-summary">
+                <span class="avatar">{{initial .Username}}</span>
+                <div class="account-text">
+                  <div class="account-line">
+                    <span class="account-name">{{.Username}}</span>
+                    <span class="account-meta">{{t .Locale "common.admin"}}</span>
+                  </div>
+                </div>
+              </div>
+            </summary>
+            <div class="account-dropdown">
+              <div class="menu-header">
+                <span class="avatar">{{initial .Username}}</span>
+                <div class="account-text">
+                  <div class="account-line">
+                    <span class="account-name">{{.Username}}</span>
+                    <span class="account-meta">{{t .Locale "common.admin"}}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="menu-divider"></div>
+              <div class="menu-group">
+                {{template "admin-settings-locale-switcher" .}}
+              </div>
+              <div class="menu-divider"></div>
+              <div class="menu-group">
+                <form method="post" action="/logout" class="menu-form">
+                  <button type="submit" class="menu-item">
+                    <span class="menu-icon">↳</span>
+                    <span class="menu-label">{{t .Locale "common.logout"}}</span>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <div>
+          <h2>{{t .Locale "dashboard.hero_title"}}</h2>
+          <p>{{t .Locale "dashboard.hero_body"}}</p>
+        </div>
+        <div class="hero-actions">
+          <a class="button button-secondary" href="/tasks">{{t .Locale "dashboard.tasks_nav"}}</a>
+          <a class="button button-primary" href="/tasks/new" target="_blank" rel="noopener">{{t .Locale "tasks.create_task"}}</a>
+        </div>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="metric-card">
+          <span>{{t .Locale "dashboard.total_tasks"}}</span>
+          <strong>{{.Stats.Total}}</strong>
+        </article>
+        <article class="metric-card">
+          <span>{{t .Locale "dashboard.running_tasks"}}</span>
+          <strong>{{.Stats.Running}}</strong>
+        </article>
+        <article class="metric-card">
+          <span>{{t .Locale "dashboard.failed_tasks"}}</span>
+          <strong>{{.Stats.Failed}}</strong>
+        </article>
+        <article class="metric-card">
+          <span>{{t .Locale "dashboard.disabled_tasks"}}</span>
+          <strong>{{.Stats.Disabled}}</strong>
+        </article>
+      </section>
+
+      <section class="dashboard-main-grid">
+        <article class="dashboard-card">
+          <h3>{{t .Locale "dashboard.type_distribution"}}</h3>
+          <div class="type-list">
+            <div class="type-row">
+              <span class="type-label"><span class="type-icon">▶</span>manual</span>
+              <strong>{{.Stats.Manual}}</strong>
+            </div>
+            <div class="type-row">
+              <span class="type-label"><span class="type-icon">⏱</span>cron</span>
+              <strong>{{.Stats.Cron}}</strong>
+            </div>
+            <div class="type-row">
+              <span class="type-label"><span class="type-icon">●</span>daemon</span>
+              <strong>{{.Stats.Daemon}}</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="dashboard-card">
+          <h3>{{t .Locale "dashboard.task_health"}}</h3>
+          <div class="health-list">
+            <div class="health-row">
+              <span>{{t .Locale "dashboard.enabled_tasks"}}</span>
+              <strong>{{.Stats.Enabled}}</strong>
+            </div>
+            <div class="health-row">
+              <span>{{t .Locale "dashboard.total_runs"}}</span>
+              <strong>{{.Stats.Runs}}</strong>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="dashboard-card">
+        <h3>{{t .Locale "dashboard.task_table"}}</h3>
+        {{if .Tasks}}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>{{t .Locale "tasks.type"}}</th>
+                <th>{{t .Locale "dashboard.task_name"}}</th>
+                <th>{{t .Locale "tasks.current_status"}}</th>
+                <th>{{t .Locale "dashboard.run_count"}}</th>
+                <th>{{t .Locale "dashboard.last_run"}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range .Tasks}}
+              <tr>
+                <td class="cell-mono">{{.Task.Type}}</td>
+                <td><a class="task-link-inline" href="/tasks?task={{.Task.Name}}">{{.Task.Name}}</a></td>
+                <td><span class="status-pill {{statusClass .CurrentStatus}}">{{statusLabel $.Locale .CurrentStatus}}</span></td>
+                <td>{{.RunCount}}</td>
+                <td>{{if .LastRun}}{{formatTime .LastRun.StartedAt}}{{else}}{{t $.Locale "common.not_available"}}{{end}}</td>
+              </tr>
+              {{end}}
+            </tbody>
+          </table>
+        </div>
+        {{else}}
+        <div class="empty-state">{{t .Locale "dashboard.empty_tasks"}}</div>
+        {{end}}
+      </section>
+    </main>
+  </div>
+
+  {{template "admin-settings-dialog" .}}
+  <script>
+    (() => {
+      const settingsDialog = document.getElementById("settings-dialog");
+      const settingsDialogClose = document.getElementById("settings-dialog-close");
+      const settingsLanguageSelect = document.getElementById("settings-language-select");
+      const settingsTabButtons = document.querySelectorAll("[data-settings-tab-button]");
+      const settingsTabPanels = document.querySelectorAll("[data-settings-tab-panel]");
+      const passwordToggle = document.querySelector("[data-password-toggle]");
+      const passwordForm = document.querySelector("[data-password-form]");
+
+      function setSettingsTab(tabName) {
+        settingsTabButtons.forEach((button) => {
+          const isActive = button.dataset.settingsTabButton === tabName;
+          button.classList.toggle("active", isActive);
+          button.setAttribute("aria-selected", isActive ? "true" : "false");
+        });
+        settingsTabPanels.forEach((panel) => {
+          panel.hidden = panel.dataset.settingsTabPanel !== tabName;
+        });
+      }
+
+      function resetSettingsDialog() {
+        setSettingsTab("general");
+        if (passwordForm) passwordForm.hidden = true;
+        passwordToggle?.removeAttribute("hidden");
+      }
+
+      if (settingsDialog) {
+        document.querySelectorAll("[data-open-settings-dialog]").forEach((button) => {
+          button.addEventListener("click", () => {
+            resetSettingsDialog();
+            const accountMenu = button.closest("details.account-menu");
+            if (accountMenu?.open) {
+              accountMenu.open = false;
+              requestAnimationFrame(() => settingsDialog.showModal());
+              return;
+            }
+            settingsDialog.showModal();
+          });
+        });
+        settingsTabButtons.forEach((button) => {
+          button.addEventListener("click", () => setSettingsTab(button.dataset.settingsTabButton || "general"));
+        });
+        settingsDialogClose?.addEventListener("click", () => {
+          resetSettingsDialog();
+          settingsDialog.close();
+        });
+        settingsDialog.addEventListener("cancel", () => resetSettingsDialog());
+        settingsLanguageSelect?.addEventListener("change", () => {
+          if (settingsLanguageSelect.value) window.location.href = settingsLanguageSelect.value;
+        });
+        passwordToggle?.addEventListener("click", () => {
+          if (passwordForm) passwordForm.hidden = false;
+          passwordToggle.setAttribute("hidden", "");
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
+{{end}}
